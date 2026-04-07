@@ -20,60 +20,62 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding: 20px; min-height: 100vh; overflow-x: hidden; position: relative; }
-
-        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(225, 29, 72, 0.12) 0%, transparent 50%); z-index: -1; pointer-events: none; }
-        .bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.05; z-index: -2; }
+        body { background: var(--bg); color: var(--text-main); padding: 20px; min-height: 100vh; }
 
         .container { max-width: 1400px; margin: 0 auto; position: relative; }
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
 
-        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-        .logo-img { height: 45px; cursor: pointer; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; }
+        .brand-info h1 { font-size: 1.1rem; color: var(--primary); }
+        .brand-info p { font-size: 0.65rem; color: var(--text-muted); }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { padding: 20px; border-left: 4px solid var(--primary); }
         .stat-card .value { font-size: 1.4rem; font-weight: 800; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; }
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
         
-        .admin-only { display: none; }
-        body.is-admin .admin-only { display: block; }
-
         .day-group { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--card-bg); }
         .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; }
         .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .day-group.active .day-content { display: block; }
 
-        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.4); color: white; margin-bottom: 10px; }
-        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-whatsapp { background: #238636; color: white; width: 100%; margin-top: 10px; }
-        .btn-copy { background: rgba(255,255,255,0.1); color: var(--text-main); width: 100%; margin-top: 10px; border: 1px solid var(--border); font-size: 0.7rem; }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; }
+        .actions { display: flex; gap: 10px; }
+        .btn-icon { background: none; border: none; cursor: pointer; font-size: 1rem; }
+
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.4); color: white; margin-bottom: 10px; font-size: 0.85rem; }
+        label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px; }
         
-        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; border: 1px dashed var(--border); }
-        .tab { flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem; border-radius: 8px; color: var(--text-muted); }
+        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; font-size: 0.85rem; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: none; border: 1px solid var(--border); color: var(--text-main); margin-top: 5px; }
+        .btn-whatsapp { background: #238636; color: white; margin-top: 10px; }
+
+        .chart-container { height: 220px; width: 100%; }
+        .msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; margin-bottom: 10px; }
+        
+        .tabs { display: flex; gap: 5px; padding: 5px; margin-bottom: 15px; }
+        .tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; font-weight: 800; font-size: 0.7rem; border-radius: 8px; color: var(--text-muted); }
         .tab.active { background: var(--primary); color: white; }
-        .chart-container { height: 200px; width: 100%; }
     </style>
 </head>
 <body>
 
-<div class="bg-glow" id="glow"></div>
-<div class="bg-grid"></div>
-
 <div class="container">
     <header class="glass-card">
         <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
-            <div>
-                <h1 style="font-size: 1.1rem; color: var(--primary);">GRUPO RESGATE 116</h1>
-                <p style="font-size: 0.65rem; color: var(--text-muted);">Site criado por Patrick Almeida</p>
+            <img src="logo-resgate.png" height="45" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
+            <div class="brand-info">
+                <h1>GRUPO RESGATE 116</h1>
+                <p>Site criado por Patrick Almeida</p>
             </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn" style="background:none; border:1px solid var(--border); color:white;" onclick="fetchEntries()">🔄</button>
-            <button class="btn" style="background:none; border:1px solid var(--border); color:white;" onclick="toggleTheme()">🌓</button>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-icon" onclick="exportData()" title="Backup">📥</button>
+            <button class="btn-icon" onclick="importData()" title="Importar">📤</button>
+            <button class="btn-icon" onclick="fetchEntries()">🔄</button>
+            <button class="btn-icon" onclick="toggleTheme()">🌓</button>
         </div>
     </header>
 
@@ -86,24 +88,30 @@
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="card glass-card admin-only" style="padding: 20px; margin-bottom: 20px;">
-                <h4 style="margin-bottom:15px; font-size:0.7rem;">NOVO LANÇAMENTO</h4>
+            <div class="glass-card" style="padding: 20px;">
+                <h4 style="font-size:0.7rem; margin-bottom:15px; color: var(--primary)">➕ NOVO LANÇAMENTO</h4>
                 <form id="entry-form">
+                    <input type="hidden" id="edit-id">
+                    <label>Data</label>
                     <input type="date" id="input-date" required>
-                    <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
-                    <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
-                    <input type="text" id="input-desc" placeholder="NOTA FISCAL / OBS">
-                    <button type="submit" class="btn btn-primary">AGENDAR ENTRADA</button>
+                    <label>Seguradora</label>
+                    <input type="text" id="input-seguradora" placeholder="Ex: PORTO, TOKIO" required>
+                    <label>Valor (R$)</label>
+                    <input type="text" id="input-value" placeholder="0,00" required>
+                    <label>Nota Fiscal / Obs</label>
+                    <input type="text" id="input-desc" placeholder="NF-000">
+                    <button type="submit" id="btn-submit" class="btn btn-primary">AGENDAR ENTRADA</button>
+                    <button type="button" id="btn-cancel" class="btn btn-outline" style="display:none" onclick="resetForm()">CANCELAR EDIÇÃO</button>
                 </form>
             </div>
-            <div class="card glass-card" style="padding: 20px;">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">CONCENTRAÇÃO</h4>
+            <div class="glass-card" style="padding: 20px;">
+                <h4 style="font-size:0.7rem; margin-bottom:15px">CONCENTRAÇÃO</h4>
                 <div class="chart-container"><canvas id="pieChart"></canvas></div>
             </div>
         </div>
 
         <div class="center-column">
-            <div class="glass-card" style="display: flex; gap: 5px; padding: 5px; margin-bottom: 15px;">
+            <div class="glass-card tabs">
                 <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
                 <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
@@ -111,14 +119,14 @@
         </div>
 
         <div class="right-column">
-            <div class="card glass-card" style="padding: 20px; margin-bottom: 20px;">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">EVOLUÇÃO DIÁRIA</h4>
+            <div class="glass-card" style="padding: 20px;">
+                <h4 style="font-size:0.7rem; margin-bottom:15px">EVOLUÇÃO DIÁRIA</h4>
                 <div class="chart-container"><canvas id="barChart"></canvas></div>
             </div>
-            <div class="card glass-card" style="padding: 20px;">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
-                <div id="msg-preview"></div>
-                <button class="btn btn-copy" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
+            <div class="glass-card" style="padding: 20px;">
+                <h4 style="font-size:0.7rem; margin-bottom:15px">RESUMO WHATSAPP</h4>
+                <div id="msg-preview" class="msg-preview">Aguardando dados...</div>
+                <button class="btn btn-outline" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
                 <button class="btn btn-whatsapp" onclick="sendWhatsApp()">🚀 ENVIAR GRUPO</button>
             </div>
         </div>
@@ -135,49 +143,60 @@
     let pieChart, barChart;
 
     async function fetchEntries() {
-        const { data } = await _supabase.from('entries').select('*').order('date', { ascending: true });
-        entries = data || [];
-        render();
+        const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
+        if (!error) { entries = data; render(); }
     }
+
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('edit-id').value;
+        const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
+        const data = {
+            date: document.getElementById('input-date').value,
+            seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
+            value: val,
+            desc: document.getElementById('input-desc').value
+        };
+
+        if (id) await _supabase.from('entries').update(data).eq('id', id);
+        else await _supabase.from('entries').insert([data]);
+        
+        resetForm();
+        fetchEntries();
+    });
 
     function render() {
         const hoje = new Date().toISOString().split('T')[0];
-        const agora = new Date();
-        const mesAtual = agora.getMonth();
-        const anoAtual = agora.getFullYear();
-
-        let somaHoje = 0, somaRestanteMes = 0, somaLiquidados = 0, somaTotalMes = 0;
-        let segTotals = {};
-        let dailyTotals = {};
+        const mesAtual = new Date().getMonth();
+        let sHoje = 0, sRestante = 0, sLiq = 0, sTotal = 0;
+        let segTotals = {}, dailyTotals = {};
 
         entries.forEach(e => {
             const d = new Date(e.date + 'T12:00:00');
-            if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) {
-                somaTotalMes += e.value;
-                if (e.date >= hoje) somaRestanteMes += e.value;
-                else somaLiquidados += e.value;
+            if (d.getMonth() === mesAtual) {
+                sTotal += e.value;
+                if (e.date >= hoje) sRestante += e.value;
+                else sLiq += e.value;
             }
-            if (e.date === hoje) somaHoje += e.value;
-            
+            if (e.date === hoje) sHoje += e.value;
             segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
             dailyTotals[e.date] = (dailyTotals[e.date] || 0) + e.value;
         });
 
-        document.getElementById('stat-hoje').innerText = formatCurrency(somaHoje);
-        document.getElementById('stat-restante-mes').innerText = formatCurrency(somaRestanteMes);
-        document.getElementById('stat-liquidados').innerText = formatCurrency(somaLiquidados);
-        document.getElementById('stat-total-mes').innerText = formatCurrency(somaTotalMes);
+        document.getElementById('stat-hoje').innerText = formatCurrency(sHoje);
+        document.getElementById('stat-restante-mes').innerText = formatCurrency(sRestante);
+        document.getElementById('stat-liquidados').innerText = formatCurrency(sLiq);
+        document.getElementById('stat-total-mes').innerText = formatCurrency(sTotal);
 
         const filtered = entries.filter(e => currentTab === 'proximos' ? e.date >= hoje : e.date < hoje);
         const groups = filtered.reduce((acc, e) => { acc[e.date] = acc[e.date] || []; acc[e.date].push(e); return acc; }, {});
 
-        const listCont = document.getElementById('list-container');
-        listCont.innerHTML = '';
-        
+        const cont = document.getElementById('list-container');
+        cont.innerHTML = '';
         Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
             const div = document.createElement('div');
-            div.className = 'day-group';
+            div.className = 'day-group active';
             div.innerHTML = `
                 <div class="day-header" onclick="this.parentElement.classList.toggle('active')">
                     <span><b>${date.split('-').reverse().slice(0,2).join('/')}</b></span>
@@ -185,17 +204,48 @@
                 </div>
                 <div class="day-content">
                     ${groups[date].map(e => `
-                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; padding:8px 0; border-bottom:1px solid var(--border)">
-                            <span><b>${e.seguradora}</b> ${e.desc ? '- ' + e.desc : ' (S/ NF)'}</span>
-                            <b>${formatCurrency(e.value)}</b>
+                        <div class="entry-row">
+                            <span><b>${e.seguradora}</b> ${e.desc ? '- ' + e.desc : ''}</span>
+                            <div class="actions">
+                                <span>${formatCurrency(e.value)}</span>
+                                <button class="btn-icon" onclick="editEntry(${e.id})">✏️</button>
+                                <button class="btn-icon" onclick="deleteEntry(${e.id})">🗑️</button>
+                            </div>
                         </div>
                     `).join('')}
                 </div>`;
-            listCont.appendChild(div);
+            cont.appendChild(div);
         });
 
         updateCharts(segTotals, dailyTotals);
         updateWhatsapp();
+    }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id == id);
+        document.getElementById('edit-id').value = e.id;
+        document.getElementById('input-date').value = e.date;
+        document.getElementById('input-seguradora').value = e.seguradora;
+        document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        document.getElementById('input-desc').value = e.desc;
+        document.getElementById('btn-submit').innerText = "SALVAR ALTERAÇÃO";
+        document.getElementById('btn-cancel').style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    async function deleteEntry(id) {
+        if(confirm('Excluir este lançamento?')) {
+            await _supabase.from('entries').delete().eq('id', id);
+            fetchEntries();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('entry-form').reset();
+        document.getElementById('edit-id').value = '';
+        document.getElementById('btn-submit').innerText = "AGENDAR ENTRADA";
+        document.getElementById('btn-cancel').style.display = "none";
+        document.getElementById('input-date').valueAsDate = new Date();
     }
 
     function updateCharts(segData, dailyData) {
@@ -207,19 +257,36 @@
         });
 
         if (barChart) barChart.destroy();
+        const lastDays = Object.keys(dailyData).sort().slice(-7);
         barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
-            data: { 
-                labels: Object.keys(dailyData).map(d => d.split('-').reverse().slice(0,2).join('/')), 
-                datasets: [{ label: 'R$', data: Object.values(dailyData), backgroundColor: '#e11d48' }] 
-            },
+            data: { labels: lastDays.map(d => d.split('-').reverse().slice(0,2).join('/')), datasets: [{ label: 'R$', data: lastDays.map(d => dailyData[d]), backgroundColor: '#e11d48' }] },
             options: { maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { color: '#8b949e', font: { size: 9 } } } }, plugins: { legend: { display: false } } }
         });
     }
 
+    function exportData() {
+        const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_financeiro.json'; a.click();
+    }
+
+    function importData() {
+        const input = document.createElement('input'); input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = async re => {
+                const data = JSON.parse(re.target.result);
+                for (const item of data) { delete item.id; await _supabase.from('entries').insert([item]); }
+                fetchEntries();
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    }
+
     function updateWhatsapp() {
         let msg = "📊 *PREVISÃO RESGATE 116*\n\n";
-        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(e => {
+        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,6).forEach(e => {
             msg += `📅 ${e.date.split('-').reverse().slice(0,2).join('/')} - ${e.seguradora}: *${formatCurrency(e.value)}*\n`;
         });
         document.getElementById('msg-preview').innerText = msg;
@@ -227,16 +294,17 @@
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-    function switchTab(t) { currentTab = t; render(); }
+    function switchTab(t) { currentTab = t; document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); document.getElementById('tab-historico').classList.toggle('active', t==='historico'); render(); }
     function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert("Copiado!")); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
-    document.addEventListener('mousemove', e => {
-        const glow = document.getElementById('glow');
-        glow.style.setProperty('--x', e.clientX + 'px');
-        glow.style.setProperty('--y', e.clientY + 'px');
+    document.getElementById('input-value').addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        v = (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        e.target.value = v;
     });
 
+    document.getElementById('input-date').valueAsDate = new Date();
     fetchEntries();
 </script>
 </body>
