@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Financeiro - Grupo Resgate 116</title>
+    <link rel="icon" type="image/png" href="dinheiro.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        :root {
+            --primary: #e11d48;
+            --primary-hover: #be123c;
+            --success: #10b981;
+            --danger: #ef4444;
+            --whatsapp: #25d366;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --input-bg: #ffffff;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --input-bg: #0f172a;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s; }
+        body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; background-image: radial-gradient(circle at 2px 2px, var(--border) 1px, transparent 0); background-size: 40px 40px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 55px; width: auto; max-width: 180px; object-fit: contain; }
+        .brand-info h1 { font-size: 1.15rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        .brand-info p { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); border-left: 4px solid var(--primary); }
+        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
+        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); text-transform: uppercase; }
+        input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; outline: none; }
+        .btn { padding: 10px 15px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-whatsapp { background: var(--whatsapp); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        .day-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card-bg); }
+        .day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; cursor: pointer; border-left: 4px solid var(--primary); }
+        .day-content { padding: 0 15px 15px 15px; display: none; border-top: 1px solid var(--border); background: var(--bg); }
+        .day-group.active .day-content { display: block; }
+        .seguradora-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 5px; font-size: 0.85rem; }
+        .chart-container { position: relative; height: 220px; width: 100%; }
+        .msg-box { background: #0f172a; color: #10b981; padding: 15px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; font-size: 0.75rem; margin-bottom: 15px; max-height: 200px; overflow-y: auto; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .tab { padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem; background: var(--border); color: var(--text-muted); }
+        .tab.active { background: var(--primary); color: white; }
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; color: white; }
+    </style>
+</head>
+<body data-theme="dark">
+
+<div id="loading" class="loading-overlay">Sincronizando...</div>
+
+<div class="container">
+    <header>
+        <div class="logo-container">
+            <img id="main-logo" src="https://via.placeholder.com/180x60?text=GRUPO+RESGATE+116" alt="Logo" class="logo-img">
+            <div class="brand-info">
+                <h1>Grupo Resgate 116</h1>
+                <p>Dashboard em Tempo Real (Cloud)</p>
+            </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline btn-icon" onclick="toggleTheme()" id="theme-btn">☀️</button>
+            <button class="btn btn-outline btn-icon" onclick="fetchEntries()" title="Atualizar">🔄</button>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card"><h3>Total Previsto (Semana)</h3><div class="value" id="stat-total-semana">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Total Acumulado (Mês)</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Top Seguradora</h3><div class="value" id="stat-top-seguradora">-</div></div>
+        <div class="stat-card"><h3>Lançamentos</h3><div class="value" id="stat-count">0</div></div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="left-column">
+            <div class="card">
+                <div class="card-title">➕ Novo Lançamento</div>
+                <form id="entry-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-group"><label>Data</label><input type="date" id="input-date" required></div>
+                    <div class="form-group"><label>Seguradora</label><input type="text" id="input-seguradora" placeholder="MONDIAL" required list="seguradoras-list"><datalist id="seguradoras-list"></datalist></div>
+                    <div class="form-group"><label>Valor (R$)</label><input type="text" id="input-value" placeholder="0,00" required></div>
+                    <div class="form-group"><label>Descrição</label><input type="text" id="input-desc" placeholder="NF097"></div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Enviar para Nuvem</button>
+                    <button type="button" class="btn btn-outline" id="cancel-edit" style="display: none; margin-top: 5px;" onclick="resetForm()">Cancelar</button>
+                </form>
+            </div>
+            <div class="card"><div class="card-title">📊 Divisão</div><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+        </div>
+
+        <div class="center-column">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('semana')" id="tab-semana">Semana Atual</div>
+                <div class="tab" onclick="switchTab('mes')" id="tab-mes">Mês Vigente</div>
+            </div>
+            <div id="list-container"></div>
+        </div>
+
+        <div class="right-column">
+            <div class="card"><div class="card-title">📈 Evolução</div><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+            <div class="card">
+                <div class="card-title">📲 Compartilhar</div>
+                <div class="msg-box" id="msg-preview">Aguardando...</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn btn-outline" onclick="copyMessage()">Copiar</button>
+                    <button class="btn btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- CONFIGURAÇÃO SUPABASE ---
+    const SUPABASE_URL = 'https://glmyblygbvhpluwncbtm.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_YrkMBRNfMg9PnEZzGERmFw_C-2MUArW';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let entries = [];
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    let currentTab = 'semana';
+    let openDays = {};
+    let pieChart, barChart;
+
+    async function init() {
+        applyTheme(currentTheme);
+        initCharts();
+        document.getElementById('input-date').valueAsDate = new Date();
+        await fetchEntries();
+    }
+
+    async function fetchEntries() {
+        showLoading(true);
+        const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
+        if (error) alert("Erro ao buscar dados: " + error.message);
+        else { entries = data; render(); }
+        showLoading(false);
+    }
+
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showLoading(true);
+        
+        const id = document.getElementById('edit-id').value;
+        const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
+        
+        const entryData = {
+            date: document.getElementById('input-date').value,
+            seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
+            value: val,
+            desc: document.getElementById('input-desc').value
+        };
+
+        let result;
+        if (id) {
+            result = await _supabase.from('entries').update(entryData).eq('id', id);
+        } else {
+            result = await _supabase.from('entries').insert([entryData]);
+        }
+
+        if (result.error) alert("Erro ao salvar: " + result.error.message);
+        else { resetForm(); await fetchEntries(); }
+        showLoading(false);
+    });
+
+    async function deleteEntry(id) {
+        if (!confirm('Excluir do banco de dados?')) return;
+        showLoading(true);
+        const { error } = await _supabase.from('entries').delete().eq('id', id);
+        if (error) alert(error.message);
+        else await fetchEntries();
+        showLoading(false);
+    }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id == id);
+        document.getElementById('edit-id').value = e.id;
+        document.getElementById('input-date').value = e.date;
+        document.getElementById('input-seguradora').value = e.seguradora;
+        document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        document.getElementById('input-desc').value = e.desc;
+        document.getElementById('submit-btn').innerText = "Atualizar na Nuvem";
+        document.getElementById('cancel-edit').style.display = "block";
+    }
+
+    function resetForm() {
+        document.getElementById('entry-form').reset();
+        document.getElementById('edit-id').value = '';
+        document.getElementById('submit-btn').innerText = "Enviar para Nuvem";
+        document.getElementById('cancel-edit').style.display = "none";
+        document.getElementById('input-date').valueAsDate = new Date();
+    }
+
+    // --- INTERFACE E GRÁFICOS ---
+    function render() {
+        const { start, end } = getWeekRange();
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        let totalSemana = 0; let totalMes = 0; let segTotals = {}; let dailyTotals = {};
+
+        entries.forEach(e => {
+            const d = new Date(e.date + 'T12:00:00');
+            if (d >= start && d <= end) totalSemana += e.value;
+            if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) totalMes += e.value;
+            segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
+        });
+
+        document.getElementById('stat-total-semana').innerText = formatCurrency(totalSemana);
+        document.getElementById('stat-total-mes').innerText = formatCurrency(totalMes);
+        document.getElementById('stat-count').innerText = entries.length;
+
+        // Atualiza Gráficos
+        pieChart.data.labels = Object.keys(segTotals);
+        pieChart.data.datasets[0].data = Object.values(segTotals);
+        pieChart.update();
+
+        // Renderiza lista filtrada
+        const listCont = document.getElementById('list-container');
+        listCont.innerHTML = '';
+        
+        const filtered = entries.filter(e => {
+            const d = new Date(e.date + 'T12:00:00');
+            return currentTab === 'semana' ? (d >= start && d <= end) : (d.getMonth() === currentMonth);
+        });
+
+        const groups = {};
+        filtered.forEach(e => {
+            if (!groups[e.date]) groups[e.date] = [];
+            groups[e.date].push(e);
+            dailyTotals[e.date] = (dailyTotals[e.date] || 0) + e.value;
+        });
+
+        barChart.data.labels = Object.keys(dailyTotals).map(d => d.split('-').reverse().slice(0,2).join('/'));
+        barChart.data.datasets[0].data = Object.values(dailyTotals);
+        barChart.update();
+
+        for (const date in groups) {
+            const dayTotal = groups[date].reduce((s, x) => s + x.value, 0);
+            const dayDiv = document.createElement('div');
+            dayDiv.className = `day-group ${openDays[date] ? 'active' : ''}`;
+            dayDiv.innerHTML = `
+                <div class="day-header" onclick="toggleDay('${date}')">
+                    <h4>${date.split('-').reverse().join('/')}</h4>
+                    <span style="font-weight:800">${formatCurrency(dayTotal)}</span>
+                </div>
+                <div class="day-content">
+                    ${groups[date].map(e => `
+                        <div class="entry-row">
+                            <span><b>${e.seguradora}</b>: ${e.desc || '-'}</span>
+                            <div>
+                                <span>${formatCurrency(e.value)}</span>
+                                <button onclick="editEntry(${e.id})" style="border:none; background:none; cursor:pointer; margin-left:10px;">✏️</button>
+                                <button onclick="deleteEntry(${e.id})" style="border:none; background:none; cursor:pointer;">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>`;
+            listCont.appendChild(dayDiv);
+        }
+        generateMessage(totalSemana);
+    }
+
+    // Auxiliares (Mesma lógica do anterior)
+    function toggleDay(d) { openDays[d] = !openDays[d]; render(); }
+    function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
+    function getWeekRange() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const start = new Date(now.setDate(diff)); start.setHours(0,0,0,0); const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999); return { start, end }; }
+    function toggleTheme() { currentTheme = currentTheme === 'light' ? 'dark' : 'light'; document.body.setAttribute('data-theme', currentTheme); localStorage.setItem('theme', currentTheme); }
+    function applyTheme(t) { document.body.setAttribute('data-theme', t); }
+    function switchTab(t) { currentTab = t; document.getElementById('tab-semana').classList.toggle('active', t==='semana'); document.getElementById('tab-mes').classList.toggle('active', t==='mes'); render(); }
+    
+    function initCharts() {
+        pieChart = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } } });
+        barChart = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: [], datasets: [{ label: 'R$', data: [], backgroundColor: '#e11d48' }] }, options: { maintainAspectRatio: false, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } } });
+    }
+
+    function generateMessage(total) {
+        let msg = "📊 *PREVISÃO RESGATE 116*\n\n";
+        msg += `💰 *Total previsto da semana:* ${formatCurrency(total)}`;
+        document.getElementById('msg-preview').innerText = msg;
+    }
+
+    function copyMessage() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert('Copiado!')); }
+    function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
+
+    // Formatação de valor
+    document.getElementById('input-value').addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        v = (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        e.target.value = v;
+    });
+
+    init();
+</script>
+</body>
+</html>
