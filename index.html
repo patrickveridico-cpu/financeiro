@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Financeiro - Resgate 116</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2454/2454282.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,27 +20,11 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        body { 
-            background: var(--bg); 
-            color: var(--text-main); 
-            padding: 20px; 
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-        }
+        body { background: var(--bg); color: var(--text-main); padding: 20px; min-height: 100vh; overflow-x: hidden; position: relative; }
 
-        /* EFEITO DE FUNDO INTERATIVO */
-        .bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(225, 29, 72, 0.15) 0%, transparent 50%);
-            z-index: -1; pointer-events: none;
-        }
-        .bg-grid {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 50px 50px; opacity: 0.1; z-index: -2;
-        }
+        /* EFEITO DE FUNDO */
+        .bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(225, 29, 72, 0.12) 0%, transparent 50%); z-index: -1; pointer-events: none; }
+        .bg-grid { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.05; z-index: -2; }
 
         .container { max-width: 1400px; margin: 0 auto; position: relative; }
         .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; }
@@ -57,25 +42,26 @@
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
 
-        /* LISTA INTERATIVA */
+        /* LISTA */
         .day-group { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--card-bg); }
         .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; }
         .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .day-group.active .day-content { display: block; }
 
-        /* INPUTS E CALENDÁRIO */
-        input { 
-            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
-            background: rgba(0,0,0,0.4); color: white; margin-bottom: 10px; color-scheme: dark; 
-        }
-        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        /* INPUTS */
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.4); color: white; margin-bottom: 10px; color-scheme: dark; }
+        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+        .btn:hover { opacity: 0.8; }
         .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-whatsapp { background: #238636; color: white; width: 100%; margin-top: 10px; }
+        .btn-copy { background: rgba(255,255,255,0.1); color: var(--text-main); width: 100%; margin-top: 15px; font-size: 0.7rem; border: 1px solid var(--border); }
         .btn-icon { width: 40px; height: 40px; padding: 0; background: var(--card-bg); color: white; border: 1px solid var(--border); }
         
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; transition: 0.2s; }
-        .action-btn:hover { background: rgba(255,255,255,0.1); }
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; }
 
-        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; }
+        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; border: 1px dashed var(--border); }
+        .tab { flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem; border-radius: 8px; color: var(--text-muted); }
+        .tab.active { background: var(--primary); color: white; }
     </style>
 </head>
 <body data-theme="dark">
@@ -89,12 +75,12 @@
             <img src="logo-resgate.png" class="logo-img" alt="Logo" onclick="location.reload()" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
             <div>
                 <h1 style="font-size: 1.1rem; color: var(--primary);">GRUPO RESGATE 116</h1>
-                <p style="font-size: 0.65rem; color: var(--text-muted);">Dashboard Executivo v2.5</p>
+                <p style="font-size: 0.65rem; color: var(--text-muted);">Dashboard Executivo v2.6</p>
             </div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-icon admin-only" onclick="exportData()">📤</button>
-            <button class="btn btn-icon admin-only" onclick="importData()">📥</button>
+            <button class="btn btn-icon admin-only" onclick="exportData()" title="Backup">📤</button>
+            <button class="btn btn-icon admin-only" onclick="importData()" title="Restaurar">📥</button>
             <button class="btn btn-icon" onclick="toggleTheme()">🌓</button>
             <button class="btn btn-icon" onclick="fetchEntries()">🔄</button>
         </div>
@@ -109,7 +95,7 @@
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="card glass-card admin-only" style="padding: 20px;">
+            <div class="card glass-card admin-only" style="padding: 20px; margin-bottom: 20px;">
                 <h4 style="margin-bottom:15px; font-size:0.7rem;">NOVO LANÇAMENTO</h4>
                 <form id="entry-form">
                     <input type="date" id="input-date" required>
@@ -127,8 +113,8 @@
 
         <div class="center-column">
             <div class="glass-card" style="display: flex; gap: 5px; padding: 5px; margin-bottom: 15px;">
-                <div class="tab" style="flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem;" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
-                <div class="tab" style="flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem;" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
+                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
+                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
             <div id="list-container"></div>
         </div>
@@ -137,7 +123,8 @@
             <div class="card glass-card" style="padding: 20px;">
                 <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
                 <div id="msg-preview"></div>
-                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; width: 100%; margin-top: 15px;">ENVIAR GRUPO</button>
+                <button class="btn btn-copy" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
+                <button class="btn btn-whatsapp" onclick="sendWhatsApp()">🚀 ENVIAR PARA O GRUPO</button>
             </div>
         </div>
     </div>
@@ -153,7 +140,6 @@
     let editingId = null;
     let pieChart;
 
-    // EFEITO DO CURSOR
     document.addEventListener('mousemove', e => {
         const glow = document.getElementById('glow');
         glow.style.setProperty('--x', e.clientX + 'px');
@@ -262,7 +248,7 @@
 
     function updateWhatsapp() {
         let msg = "📊 *PROGRAMAÇÕES RESGATE 116*\n\n";
-        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(e => {
+        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,7).forEach(e => {
             msg += `📅 ${e.date.split('-').reverse().slice(0,2).join('/')} - ${e.seguradora}: *${formatCurrency(e.value)}*\n`;
         });
         document.getElementById('msg-preview').innerText = msg;
@@ -270,7 +256,19 @@
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-    function switchTab(t) { currentTab = t; render(); }
+    
+    function switchTab(t) { 
+        currentTab = t; 
+        document.getElementById('tab-proximos').classList.toggle('active', t==='proximos');
+        document.getElementById('tab-historico').classList.toggle('active', t==='historico');
+        render(); 
+    }
+
+    function copyToClipboard() {
+        const text = document.getElementById('msg-preview').innerText;
+        navigator.clipboard.writeText(text).then(() => alert("Texto copiado!"));
+    }
+
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
     // Backup
@@ -293,7 +291,6 @@
         fileInput.click();
     }
 
-    // Login Admin
     if (new URLSearchParams(window.location.search).get('admin') === 'true') {
         if (prompt("Senha Admin:") === "Murrilho123*") document.body.classList.add('is-admin');
     }
