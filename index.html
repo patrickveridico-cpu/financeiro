@@ -19,9 +19,8 @@
             --bg: #f1f5f9; --card-bg: #ffffff; --text-main: #0f172a;
             --border: #e2e8f0; --highlight-yellow: #eab308;
         }
-        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; padding: 20px; margin: 0; transition: 0.3s; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; padding: 20px; margin: 0; transition: 0.3s; }
         
-        /* CURSOR NEON */
         #cursor-dot { width: 8px; height: 8px; background: var(--primary); position: fixed; border-radius: 50%; pointer-events: none; z-index: 10000; }
         #cursor-outline { width: 40px; height: 40px; border: 2px solid var(--primary); position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.1s ease-out; }
 
@@ -120,7 +119,6 @@
             document.getElementById('admin-tools').style.display = 'flex';
         }
 
-        // CURSOR ANIMATION
         const dot = document.getElementById('cursor-dot');
         const outline = document.getElementById('cursor-outline');
         window.addEventListener('mousemove', (e) => {
@@ -131,8 +129,11 @@
         function toggleTheme() {
             const body = document.body;
             const current = body.getAttribute('data-theme');
-            body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+            const next = current === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
         }
+        document.body.setAttribute('data-theme', localStorage.getItem('theme') || 'dark');
 
         const SUPABASE_URL = 'https://glmyblygbvhpluwncbtm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsbXlibHlnYnZocGx1d25jYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDY2MTQsImV4cCI6MjA5MTEyMjYxNH0.PqdwEYVYXIvOh2pYqQwaq8eyf2ZWS6BalQzOpINrXts';
@@ -167,7 +168,7 @@
             const cont = document.getElementById('list-container');
             cont.innerHTML = '';
             
-            Object.keys(groups).forEach(date => {
+            Object.keys(groups).sort().forEach(date => {
                 const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
                 const div = document.createElement('div');
                 div.className = `day-group ${openDays[date] ? 'active' : ''}`;
