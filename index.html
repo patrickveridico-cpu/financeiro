@@ -12,11 +12,11 @@
     <style>
         :root {
             --primary: #e11d48; --success: #10b981; --whatsapp: #25d366; 
-            --bg: #0b0e14; --card-bg: rgba(15, 23, 42, 0.95); --text-main: #f8fafc;
-            --border: rgba(51, 65, 85, 1); --highlight-yellow: #facc15;
+            --bg: #0b0e14; --card-bg: #161b22; --text-main: #f8fafc;
+            --border: #30363d; --highlight-yellow: #facc15;
         }
         [data-theme="light"] {
-            --bg: #f1f5f9; --card-bg: #ffffff; --text-main: #0f172a;
+            --bg: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a;
             --border: #e2e8f0; --highlight-yellow: #eab308;
         }
         body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; padding: 20px; margin: 0; transition: 0.3s; }
@@ -25,31 +25,45 @@
         #cursor-outline { width: 40px; height: 40px; border: 2px solid var(--primary); position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; transition: transform 0.1s ease-out; }
 
         .container { max-width: 1550px; margin: 0 auto; }
-        header { display: flex; align-items: center; margin-bottom: 30px; padding: 25px 40px; background: var(--card-bg); border-radius: 25px; border: 1px solid var(--border); }
+        
+        /* HEADER MOBILE FIX */
+        header { display: flex; align-items: center; margin-bottom: 30px; padding: 25px 40px; background: var(--card-bg); border-radius: 25px; border: 1px solid var(--border); flex-wrap: wrap; gap: 20px; }
         .logo-box { display: flex; align-items: center; gap: 25px; }
-        .logo-img { height: 110px; }
+        .logo-img { height: 100px; }
         .dev-info h1 { font-size: 1.8rem; font-weight: 900; color: var(--primary); margin: 0; }
         .dev-tag { background: var(--primary); color: white; padding: 5px 15px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; display: inline-block; margin-top: 5px; }
         
-        .header-actions { margin-left: auto; display: flex; gap: 12px; align-items: center; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 35px; }
+        .header-actions { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+
+        /* GRID MOBILE FIX */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 35px; }
         .stat-card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid var(--border); border-bottom: 4px solid var(--primary); }
-        .destaque-amarelo { border: 2.5px solid var(--highlight-yellow) !important; box-shadow: 0 0 15px rgba(250, 204, 21, 0.1); }
+        .destaque-amarelo { border: 2.5px solid var(--highlight-yellow) !important; box-shadow: 0 4px 15px rgba(250, 204, 21, 0.1); }
         .stat-card .value { font-size: 1.9rem; font-weight: 900; }
 
         .dashboard-grid { display: grid; grid-template-columns: 380px 1fr 380px; gap: 25px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 22px; border: 1px solid var(--border); margin-bottom: 25px; }
-        .btn { padding: 14px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; transition: 0.2s; color: white; text-transform: uppercase; font-size: 0.75rem; }
+        
+        .btn { padding: 14px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; transition: 0.2s; color: white; text-transform: uppercase; font-size: 0.75rem; min-width: 45px; }
         .btn-primary { background: var(--primary); }
         .btn-outline { background: var(--border); color: var(--text-main); }
         
-        input { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.2); color: var(--text-main); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; }
-        .day-group { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 15px; overflow: hidden; }
+        input { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border); border-radius: 10px; box-sizing: border-box; }
+        .day-group { margin-bottom: 15px; border: 1px solid var(--border); border-radius: 15px; overflow: hidden; background: var(--card-bg); }
         .day-header { display: flex; justify-content: space-between; align-items: center; padding: 20px; background: rgba(128,128,128,0.05); cursor: pointer; }
         .day-content { display: none; padding: 20px; border-top: 1px solid var(--border); }
         .day-group.active .day-content { display: block; }
-        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(128,128,128,0.1); }
-        .msg-preview { background: #000; color: #10b981; padding: 20px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; font-size: 0.9rem; border: 1px solid var(--border); margin-bottom: 15px; }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .msg-preview { background: #000; color: #10b981; padding: 20px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; font-size: 0.85rem; border: 1px solid var(--border); margin-bottom: 15px; }
+
+        /* AJUSTES MOBILE */
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            header { justify-content: center; text-align: center; }
+            .header-actions { margin-left: 0; width: 100%; justify-content: center; }
+            .logo-box { flex-direction: column; gap: 10px; }
+            #cursor-dot, #cursor-outline { display: none; }
+        }
     </style>
 </head>
 <body data-theme="dark">
@@ -59,25 +73,24 @@
     <div class="container">
         <header>
             <div class="logo-box">
-                <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x110?text=RESGATE+116'">
+                <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x100?text=LOGO'">
                 <div class="dev-info">
                     <h1>RESGATE 116</h1>
                     <div class="dev-tag">SISTEMA DEV: PATRICK ALMEIDA</div>
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn btn-outline" style="width: 55px;" onclick="toggleTheme()">🌓</button>
+                <button class="btn btn-outline" onclick="toggleTheme()">🌓 TEMA</button>
                 <div id="admin-tools" style="display: none; gap: 8px;">
                     <button class="btn btn-outline" onclick="exportData()">EXPORTAR</button>
-                    <button class="btn btn-outline" onclick="importData()">IMPORTAR</button>
                 </div>
-                <button class="btn btn-primary" onclick="fetchEntries()">🔄 SINCRONIZAR</button>
+                <button class="btn btn-primary" onclick="fetchEntries()">🔄 ATUALIZAR</button>
             </div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-card destaque-amarelo"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
-            <div class="stat-card destaque-amarelo"><h3>Restante do Mês</h3><div class="value" id="stat-restante" style="color: var(--success)">R$ 0,00</div></div>
+            <div class="stat-card destaque-amarelo"><h3>Restante Mês</h3><div class="value" id="stat-restante" style="color: var(--success)">R$ 0,00</div></div>
             <div class="stat-card"><h3>Já Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
             <div class="stat-card"><h3>Total Bruto</h3><div class="value" id="stat-total" style="color: var(--primary)">R$ 0,00</div></div>
         </div>
@@ -85,25 +98,30 @@
         <div class="dashboard-grid">
             <div class="left-column">
                 <div class="card" id="form-card" style="display: none;">
-                    <div style="font-weight: 900; margin-bottom: 20px; text-transform: uppercase; color: var(--primary);">➕ Novo Lançamento</div>
+                    <div style="font-weight: 900; margin-bottom: 20px; text-transform: uppercase; color: var(--primary);">➕ Lançar Crédito</div>
                     <form id="entry-form">
                         <input type="hidden" id="edit-id">
                         <input type="date" id="input-date" required>
                         <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
                         <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
-                        <input type="text" id="input-desc" placeholder="OBSERVAÇÃO / NF">
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">SALVAR LANÇAMENTO</button>
+                        <input type="text" id="input-desc" placeholder="NF / OBSERVAÇÃO">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">SALVAR NO SISTEMA</button>
                     </form>
                 </div>
-                <div class="card"><canvas id="pieChart" style="max-height: 250px;"></canvas></div>
+                <div class="card">
+                    <div style="font-weight: 800; font-size: 0.7rem; margin-bottom: 15px; opacity: 0.7;">DIVISÃO POR SEGURADORA</div>
+                    <canvas id="barChart" style="height: 300px;"></canvas>
+                </div>
             </div>
+            
             <div class="center-column"><div id="list-container"></div></div>
+            
             <div class="right-column">
                 <div class="card">
                     <div style="font-weight: 900; margin-bottom: 20px; text-transform: uppercase;">📱 Resumo WhatsApp</div>
-                    <div id="msg-preview" class="msg-preview">Carregando...</div>
+                    <div id="msg-preview" class="msg-preview">Carregando dados...</div>
                     <button class="btn btn-outline" style="width: 100%; margin-bottom: 10px;" onclick="copyText()">📋 COPIAR TEXTO</button>
-                    <button class="btn" style="width: 100%; background: var(--whatsapp);" onclick="sendWhatsApp()">🚀 ENVIAR WHATSAPP</button>
+                    <button class="btn" style="width: 100%; background: var(--whatsapp);" onclick="sendWhatsApp()">🚀 ENVIAR PARA GRUPO</button>
                 </div>
             </div>
         </div>
@@ -119,17 +137,17 @@
             document.getElementById('admin-tools').style.display = 'flex';
         }
 
+        // Cursor
         const dot = document.getElementById('cursor-dot');
         const outline = document.getElementById('cursor-outline');
         window.addEventListener('mousemove', (e) => {
-            dot.style.transform = `translate(${e.clientX - 4}px, ${e.clientY - 4}px)`;
-            outline.style.transform = `translate(${e.clientX - 20}px, ${e.clientY - 20}px)`;
+            dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px';
+            outline.style.left = e.clientX + 'px'; outline.style.top = e.clientY + 'px';
         });
 
         function toggleTheme() {
             const body = document.body;
-            const current = body.getAttribute('data-theme');
-            const next = current === 'dark' ? 'light' : 'dark';
+            const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
             body.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
         }
@@ -181,7 +199,7 @@
                         ${groups[date].map(e => `
                             <div class="entry-row">
                                 <span><b>${e.seguradora}</b> <small style="display:block; opacity:0.6">${e.desc || ''}</small></span>
-                                <div style="display:flex; align-items:center; gap:15px;">
+                                <div style="display:flex; align-items:center; gap:12px;">
                                     <b>${formatCurrency(e.value)}</b>
                                     ${isAdmin ? `<span onclick="editEntry(${e.id})" style="cursor:pointer">✏️</span><span onclick="deleteEntry(${e.id})" style="cursor:pointer">🗑️</span>` : ''}
                                 </div>
@@ -201,7 +219,7 @@
             let msg = "*PREVISÃO DE CRÉDITOS - RESGATE 116*\n\n";
             const proximos = entries.filter(e => e.date >= hoje).sort((a,b) => a.date.localeCompare(b.date));
             const groups = proximos.reduce((acc, e) => { acc[e.date] = acc[e.date] || []; acc[e.date].push(e); return acc; }, {});
-            Object.keys(groups).slice(0,6).forEach(date => {
+            Object.keys(groups).slice(0,7).forEach(date => {
                 const total = groups[date].reduce((s, x) => s + x.value, 0);
                 msg += `🗓️ ${date.split('-').reverse().slice(0,2).join('/')}: *${formatCurrency(total)}*\n`;
             });
@@ -209,42 +227,23 @@
         }
 
         function renderChart(segTotals) {
-            const ctx = document.getElementById('pieChart').getContext('2d');
+            const ctx = document.getElementById('barChart').getContext('2d');
             if(window.myChart) window.myChart.destroy();
+            const labels = Object.keys(segTotals);
+            const values = Object.values(segTotals);
             window.myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: { labels: Object.keys(segTotals), datasets: [{ data: Object.values(segTotals), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#facc15', '#8b5cf6'], borderWidth: 0 }] },
-                options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Valor', data: values, backgroundColor: '#e11d48', borderRadius: 5 }] },
+                options: { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { display: false }, ticks: { color: '#888', font: { size: 10 } } } } }
             });
         }
 
-        function copyText() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText); alert("Copiado!"); }
+        function copyText() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText); alert("Resumo Copiado!"); }
         function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
         async function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries));
-            const downloadAnchorNode = document.createElement('a');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "backup_financeiro.json");
-            downloadAnchorNode.click();
-        }
-
-        async function importData() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = async event => {
-                    const imported = JSON.parse(event.target.result);
-                    if(confirm("Deseja importar " + imported.length + " registros?")) {
-                        await _supabase.from('entries').insert(imported);
-                        fetchEntries();
-                    }
-                };
-                reader.readAsText(file);
-            };
-            input.click();
+            const download = document.createElement('a'); download.href = dataStr; download.download = "financeiro_resgate.json"; download.click();
         }
 
         document.getElementById('input-value').addEventListener('input', e => {
@@ -255,8 +254,8 @@
 
         document.getElementById('entry-form').onsubmit = async (e) => {
             e.preventDefault();
-            const pass = prompt("Senha Admin:");
-            if(pass !== MASTER_PASS) return alert("Errada!");
+            const pass = prompt("Confirme a senha Admin:");
+            if(pass !== MASTER_PASS) return alert("Acesso Negado!");
             const id = document.getElementById('edit-id').value;
             const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
             const data = {
@@ -281,7 +280,7 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        async function deleteEntry(id) { if(confirm('Excluir?') && prompt("Senha:") === MASTER_PASS) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
+        async function deleteEntry(id) { if(confirm('Excluir este lançamento?') && prompt("Senha:") === MASTER_PASS) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
 
         fetchEntries();
     </script>
