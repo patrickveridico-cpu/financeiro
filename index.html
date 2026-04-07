@@ -10,7 +10,7 @@
     
     <style>
         :root {
-            --primary: #e11d48; --success: #10b981; --bg: #0b0e14; --card-bg: rgba(22, 27, 34, 0.8); 
+            --primary: #e11d48; --success: #10b981; --bg: #0b0e14; --card-bg: rgba(22, 27, 34, 0.7); 
             --text-main: #f0f6fc; --text-muted: #8b949e; --border: rgba(48, 54, 61, 0.8);
         }
         [data-theme="light"] {
@@ -19,60 +19,82 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: var(--text-main); padding: 20px; transition: 0.3s; min-height: 100vh; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--text-main); 
+            padding: 20px; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
 
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; }
+        /* EFEITO DE FUNDO INTERATIVO */
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(225, 29, 72, 0.15) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px; opacity: 0.1; z-index: -2;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; position: relative; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(15px); border: 1px solid var(--border); border-radius: 12px; }
 
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 45px; }
+        .logo-img { height: 45px; cursor: pointer; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { padding: 20px; border-left: 4px solid var(--primary); }
         .stat-card.previsao { border-left-color: var(--success); }
-        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; }
         .stat-card .value { font-size: 1.4rem; font-weight: 800; }
 
         .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; }
-        .card { padding: 20px; margin-bottom: 20px; }
         
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
 
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 10px; }
-        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
-        .tab.active { background: var(--primary); color: white; }
-
-        .day-group { margin-bottom: 8px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: var(--card-bg); }
-        .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; transition: 0.2s; }
-        .day-header:hover { background: rgba(225, 29, 72, 0.1); }
-        .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.1); }
+        /* LISTA INTERATIVA */
+        .day-group { margin-bottom: 8px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--card-bg); }
+        .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; }
+        .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .day-group.active .day-content { display: block; }
-        
-        /* Inputs e Calendário */
-        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; margin-bottom: 10px; color-scheme: dark; }
-        .btn { padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-icon { width: 40px; padding: 0; background: var(--card-bg); border: 1px solid var(--border); color: white; }
 
-        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; min-height: 100px; }
+        /* INPUTS E CALENDÁRIO */
+        input { 
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; 
+            background: rgba(0,0,0,0.4); color: white; margin-bottom: 10px; color-scheme: dark; 
+        }
+        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-icon { width: 40px; height: 40px; padding: 0; background: var(--card-bg); color: white; border: 1px solid var(--border); }
+        
+        .action-btn { background: none; border: none; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 4px; transition: 0.2s; }
+        .action-btn:hover { background: rgba(255,255,255,0.1); }
+
+        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; }
     </style>
 </head>
 <body data-theme="dark">
 
+<div class="bg-glow" id="glow"></div>
+<div class="bg-grid"></div>
+
 <div class="container">
     <header class="glass-card">
-        <div class="logo-area">
-            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
-            <div class="brand-info">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img src="logo-resgate.png" class="logo-img" alt="Logo" onclick="location.reload()" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
+            <div>
                 <h1 style="font-size: 1.1rem; color: var(--primary);">GRUPO RESGATE 116</h1>
-                <div style="font-size: 0.65rem; color: var(--text-muted);">Site criado por Patrick Almeida</div>
+                <p style="font-size: 0.65rem; color: var(--text-muted);">Dashboard Executivo v2.5</p>
             </div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn btn-icon admin-only" onclick="exportData()" title="Exportar JSON">📤</button>
-            <button class="btn btn-icon admin-only" onclick="importData()" title="Importar JSON">📥</button>
+            <button class="btn btn-icon admin-only" onclick="exportData()">📤</button>
+            <button class="btn btn-icon admin-only" onclick="importData()">📥</button>
             <button class="btn btn-icon" onclick="toggleTheme()">🌓</button>
             <button class="btn btn-icon" onclick="fetchEntries()">🔄</button>
         </div>
@@ -81,41 +103,41 @@
     <div class="stats-grid">
         <div class="stat-card glass-card previsao"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
         <div class="stat-card glass-card previsao"><h3>Restante do Mês</h3><div class="value" id="stat-restante-mes">R$ 0,00</div></div>
-        <div class="stat-card glass-card"><h3>Já Liquidados (Mês)</h3><div class="value" id="stat-liquidados" style="color: var(--text-muted)">R$ 0,00</div></div>
-        <div class="stat-card glass-card"><h3>Total Programado (Mês)</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
+        <div class="stat-card glass-card"><h3>Já Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
+        <div class="stat-card glass-card"><h3>Total Programado</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="card glass-card admin-only">
-                <h4 style="margin-bottom:15px; font-size:0.7rem; letter-spacing:1px">NOVO LANÇAMENTO</h4>
+            <div class="card glass-card admin-only" style="padding: 20px;">
+                <h4 style="margin-bottom:15px; font-size:0.7rem;">NOVO LANÇAMENTO</h4>
                 <form id="entry-form">
                     <input type="date" id="input-date" required>
                     <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
                     <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
-                    <input type="text" id="input-obs" placeholder="NOTA FISCAL / OBS">
-                    <button type="submit" class="btn btn-primary">AGENDAR ENTRADA</button>
+                    <input type="text" id="input-obs" placeholder="NOTA FISCAL / DESCRIÇÃO">
+                    <button type="submit" class="btn btn-primary" id="btn-submit">AGENDAR ENTRADA</button>
                 </form>
             </div>
-            <div class="card glass-card">
+            <div class="card glass-card" style="padding: 20px;">
                 <h4 style="margin-bottom:15px; font-size:0.7rem">CONCENTRAÇÃO</h4>
-                <div style="height: 200px;"><canvas id="pieChart"></canvas></div>
+                <div style="height: 220px;"><canvas id="pieChart"></canvas></div>
             </div>
         </div>
 
         <div class="center-column">
-            <div class="tabs glass-card">
-                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
-                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
+            <div class="glass-card" style="display: flex; gap: 5px; padding: 5px; margin-bottom: 15px;">
+                <div class="tab" style="flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem;" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
+                <div class="tab" style="flex:1; text-align:center; padding:10px; cursor:pointer; font-weight:800; font-size:0.7rem;" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
             <div id="list-container"></div>
         </div>
 
         <div class="right-column">
-            <div class="card glass-card">
+            <div class="card glass-card" style="padding: 20px;">
                 <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
                 <div id="msg-preview"></div>
-                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; margin-top: 15px;">ENVIAR PARA O GRUPO</button>
+                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; width: 100%; margin-top: 15px;">ENVIAR GRUPO</button>
             </div>
         </div>
     </div>
@@ -128,7 +150,15 @@
 
     let entries = [];
     let currentTab = 'proximos';
+    let editingId = null;
     let pieChart;
+
+    // EFEITO DO CURSOR
+    document.addEventListener('mousemove', e => {
+        const glow = document.getElementById('glow');
+        glow.style.setProperty('--x', e.clientX + 'px');
+        glow.style.setProperty('--y', e.clientY + 'px');
+    });
 
     async function fetchEntries() {
         const { data } = await _supabase.from('entries').select('*').order('date', { ascending: true });
@@ -144,7 +174,6 @@
 
         let somaHoje = 0, somaRestanteMes = 0, somaLiquidados = 0, somaTotalMes = 0;
         let segTotals = {};
-        let semanaValores = {};
 
         entries.forEach(e => {
             const d = new Date(e.date + 'T12:00:00');
@@ -153,12 +182,9 @@
                 if (e.date >= hoje) {
                     somaRestanteMes += e.value;
                     segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
-                } else {
-                    somaLiquidados += e.value;
-                }
+                } else { somaLiquidados += e.value; }
             }
             if (e.date === hoje) somaHoje += e.value;
-            semanaValores[e.date] = (semanaValores[e.date] || 0) + e.value;
         });
 
         document.getElementById('stat-hoje').innerText = formatCurrency(somaHoje);
@@ -171,6 +197,7 @@
 
         const listCont = document.getElementById('list-container');
         listCont.innerHTML = '';
+        
         Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
             const div = document.createElement('div');
@@ -182,18 +209,42 @@
                 </div>
                 <div class="day-content">
                     ${groups[date].map(e => `
-                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; padding:8px 0; border-bottom:1px solid var(--border)">
+                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; padding:8px 0; border-bottom:1px solid var(--border)">
                             <span style="flex:1"><b>${e.seguradora}</b></span>
                             <span style="flex:1; text-align:center; color:var(--text-muted)">${e.description || 'S/ NF'}</span>
-                            <span style="flex:1; text-align:right"><b>${formatCurrency(e.value)}</b></span>
+                            <span style="flex:1; text-align:right; display:flex; align-items:center; justify-content:flex-end; gap:10px;">
+                                <b>${formatCurrency(e.value)}</b>
+                                <div class="admin-only">
+                                    <button class="action-btn" onclick="editEntry('${e.id}')">✏️</button>
+                                    <button class="action-btn" onclick="deleteEntry('${e.id}')">🗑️</button>
+                                </div>
+                            </span>
                         </div>
                     `).join('')}
                 </div>`;
             listCont.appendChild(div);
         });
-
         updateChart(segTotals);
-        updateWhatsapp(semanaValores);
+        updateWhatsapp();
+    }
+
+    async function deleteEntry(id) {
+        if(confirm("Excluir este lançamento?")) {
+            await _supabase.from('entries').delete().eq('id', id);
+            fetchEntries();
+        }
+    }
+
+    function editEntry(id) {
+        const item = entries.find(e => e.id == id);
+        if(!item) return;
+        editingId = id;
+        document.getElementById('input-date').value = item.date;
+        document.getElementById('input-seguradora').value = item.seguradora;
+        document.getElementById('input-value').value = item.value.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+        document.getElementById('input-obs').value = item.description || '';
+        document.getElementById('btn-submit').innerText = "ATUALIZAR LANÇAMENTO";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function updateChart(data) {
@@ -209,49 +260,40 @@
         });
     }
 
-    function updateWhatsapp(valores) {
-        let msg = "📊 *PROGRAMAÇÕES DA SEMANA*\n\n";
-        const diasSemana = ["Dom", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-        Object.keys(valores).sort().filter(d => d >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(date => {
-            const d = new Date(date + 'T12:00:00');
-            msg += `📅 ${date.split('-').reverse().slice(0,2).join('/')} (${diasSemana[d.getDay()]}) - *${formatCurrency(valores[date])}*\n`;
+    function updateWhatsapp() {
+        let msg = "📊 *PROGRAMAÇÕES RESGATE 116*\n\n";
+        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(e => {
+            msg += `📅 ${e.date.split('-').reverse().slice(0,2).join('/')} - ${e.seguradora}: *${formatCurrency(e.value)}*\n`;
         });
         document.getElementById('msg-preview').innerText = msg;
     }
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
-    function switchTab(t) { currentTab = t; document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); document.getElementById('tab-historico').classList.toggle('active', t==='historico'); render(); }
+    function switchTab(t) { currentTab = t; render(); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
-    // Import/Export Functions
+    // Backup
     async function exportData() {
         const { data } = await _supabase.from('entries').select('*');
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `backup_resgate116_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_financeiro.json'; a.click();
     }
 
     async function importData() {
-        const input = document.createElement('input');
-        input.type = 'file'; input.accept = '.json';
-        input.onchange = async e => {
-            const file = e.target.files[0];
+        const fileInput = document.createElement('input'); fileInput.type = 'file';
+        fileInput.onchange = e => {
             const reader = new FileReader();
             reader.onload = async event => {
                 const json = JSON.parse(event.target.result);
-                if(confirm(`Importar ${json.length} registros? Isso não apagará os atuais.`)) {
-                    await _supabase.from('entries').insert(json.map(x => ({ date: x.date, seguradora: x.seguradora, value: x.value, description: x.description })));
-                    fetchEntries();
-                }
+                await _supabase.from('entries').insert(json); fetchEntries();
             };
-            reader.readAsText(file);
+            reader.readAsText(e.target.files[0]);
         };
-        input.click();
+        fileInput.click();
     }
 
+    // Login Admin
     if (new URLSearchParams(window.location.search).get('admin') === 'true') {
         if (prompt("Senha Admin:") === "Murrilho123*") document.body.classList.add('is-admin');
     }
@@ -264,12 +306,21 @@
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const val = parseFloat(document.getElementById('input-value').value.replace(/\D/g, '')) / 100;
-        await _supabase.from('entries').insert([{ 
+        const payload = { 
             date: document.getElementById('input-date').value, 
             seguradora: document.getElementById('input-seguradora').value.toUpperCase(), 
             value: val,
             description: document.getElementById('input-obs').value.toUpperCase()
-        }]);
+        };
+
+        if(editingId) {
+            await _supabase.from('entries').update(payload).eq('id', editingId);
+            editingId = null;
+            document.getElementById('btn-submit').innerText = "AGENDAR ENTRADA";
+        } else {
+            await _supabase.from('entries').insert([payload]);
+        }
+        
         document.getElementById('entry-form').reset();
         fetchEntries();
     });
