@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Financeiro - Grupo Resgate 116</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <title>Previsão de Créditos - Grupo Resgate 116</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,122 +14,107 @@
             --primary: #e11d48; --primary-hover: #be123c; --success: #10b981; --danger: #ef4444;
             --whatsapp: #25d366; --bg: #f1f5f9; --card-bg: #ffffff; --text-main: #0f172a;
             --text-muted: #64748b; --border: #e2e8f0; --input-bg: #ffffff;
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
         [data-theme="dark"] {
             --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
-            --border: #334155; --input-bg: #0f172a; --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+            --border: #334155; --input-bg: #0f172a;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s; }
-        body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; background-image: radial-gradient(circle at 2px 2px, var(--border) 1px, transparent 0); background-size: 40px 40px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .logo-container { display: flex; align-items: center; gap: 15px; cursor: pointer; position: relative; }
-        .logo-container:hover .logo-overlay { opacity: 1; }
-        .logo-img { height: 55px; width: auto; max-width: 180px; object-fit: contain; }
-        .logo-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; border-radius: 8px; opacity: 0; transition: opacity 0.2s; }
-        .brand-info h1 { font-size: 1.15rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
-        .brand-info p { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); border-left: 4px solid var(--primary); }
-        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-        .stat-card .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
-        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
         
-        /* ADAPTAÇÃO PARA VISITANTE */
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); }
+        .brand-info h1 { font-size: 1.15rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); border-left: 4px solid var(--success); }
+        .stat-card.neutral { border-left-color: var(--text-muted); opacity: 0.8; }
+        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 800; }
+
+        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
         .admin-only { display: none; }
         body.is-admin .admin-only { display: block; }
-        body.is-admin .admin-inline { display: inline-block; }
         .admin-inline { display: none; }
+        body.is-admin .admin-inline { display: inline-block; }
 
-        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); text-transform: uppercase; }
-        input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--input-bg); color: var(--text-main); font-size: 0.9rem; outline: none; }
-        .btn { padding: 10px 15px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; width: 100%; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .card-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; color: var(--text-muted); }
+        
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--input-bg); color: var(--text-main); margin-bottom: 10px; }
+        .btn { padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 0.85rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-whatsapp { background: var(--whatsapp); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .day-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card-bg); }
-        .day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; cursor: pointer; border-left: 4px solid var(--primary); }
-        .day-content { padding: 0 15px 15px 15px; display: none; border-top: 1px solid var(--border); background: var(--bg); }
-        .day-group.active .day-content { display: block; }
-        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 5px; font-size: 0.85rem; }
-        .chart-container { position: relative; height: 220px; width: 100%; }
-        .msg-box { background: #0f172a; color: #10b981; padding: 15px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; font-size: 0.75rem; margin-bottom: 15px; max-height: 200px; overflow-y: auto; }
-        .tabs { display: flex; gap: 8px; margin-bottom: 15px; }
-        .tab { padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.75rem; background: var(--border); color: var(--text-muted); }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; background: var(--card-bg); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.75rem; color: var(--text-muted); }
         .tab.active { background: var(--primary); color: white; }
-        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 999; color: white; }
+
+        .day-group { margin-bottom: 10px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); overflow: hidden; }
+        .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; background: rgba(16, 185, 129, 0.05); }
+        .day-content { padding: 10px; display: none; border-top: 1px solid var(--border); }
+        .day-group.active .day-content { display: block; }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+        
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 999; color: white; }
     </style>
 </head>
 <body data-theme="dark">
 
-<div id="loading" class="loading-overlay">Sincronizando com a Nuvem...</div>
+<div id="loading" class="loading-overlay">Atualizando Previsões...</div>
 
 <div class="container">
     <header>
-        <div class="logo-container" onclick="if(isAdmin) document.getElementById('logo-upload').click()">
-            <div class="logo-overlay admin-only">TROCAR LOGO</div>
-            <img id="main-logo" src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/180x60?text=RESGATE+116'">
-            <input type="file" id="logo-upload" hidden accept="image/*">
-            <div class="brand-info">
-                <h1>Grupo Resgate 116</h1>
-                <p>Dashboard Executivo Cloud</p>
-            </div>
+        <div class="brand-info">
+            <h1>Resgate 116</h1>
+            <p style="font-size: 0.7rem; color: var(--text-muted)">Previsão de Créditos em Conta</p>
         </div>
         <div style="display: flex; gap: 8px;">
-            <button class="btn btn-outline btn-icon" onclick="toggleTheme()" id="theme-btn">☀️</button>
-            <button class="btn btn-outline btn-icon" onclick="fetchEntries()" title="Atualizar">🔄</button>
-            <button class="btn btn-outline btn-icon admin-only" onclick="exportData()" title="Backup">📥</button>
-            <button class="btn btn-outline btn-icon admin-only" onclick="importData()" title="Importar">📤</button>
+            <button class="btn btn-outline" onclick="toggleTheme()" style="width: 40px">☀️</button>
+            <button class="btn btn-outline" onclick="fetchEntries()" style="width: 40px">🔄</button>
+            <button class="btn btn-outline admin-only" onclick="exportData()" style="width: 40px">📥</button>
         </div>
     </header>
 
     <div class="stats-grid">
-        <div class="stat-card"><h3>Total Semana</h3><div class="value" id="stat-total-semana">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Total Mês</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Top Seguradora</h3><div class="value" id="stat-top-seguradora">-</div></div>
-        <div class="stat-card"><h3>Lançamentos</h3><div class="value" id="stat-count">0</div></div>
+        <div class="stat-card"><h3>Previsão para Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Previsão Restante Semana</h3><div class="value" id="stat-semana-futura">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Previsão Total Mês</h3><div class="value" id="stat-mes-total">R$ 0,00</div></div>
+        <div class="stat-card neutral"><h3>Acumulado Bruto (Base)</h3><div class="value" id="stat-bruto">R$ 0,00</div></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="left-column">
             <div class="card admin-only">
-                <div class="card-title">➕ Novo Lançamento</div>
+                <div class="card-title">📅 Agendar Crédito</div>
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
-                    <div class="form-group"><label>Data</label><input type="date" id="input-date" required></div>
-                    <div class="form-group"><label>Seguradora</label><input type="text" id="input-seguradora" required list="seguradoras-list"><datalist id="seguradoras-list"></datalist></div>
-                    <div class="form-group"><label>Valor (R$)</label><input type="text" id="input-value" placeholder="0,00" required></div>
-                    <div class="form-group"><label>Descrição</label><input type="text" id="input-desc"></div>
-                    <button type="submit" class="btn btn-primary" id="submit-btn">Adicionar</button>
-                    <button type="button" class="btn btn-outline" id="cancel-edit" style="display: none; margin-top: 5px;" onclick="resetForm()">Cancelar</button>
+                    <input type="date" id="input-date" required>
+                    <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
+                    <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
+                    <input type="text" id="input-desc" placeholder="OBSERVAÇÃO">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Agendar Entrada</button>
                 </form>
             </div>
-            <div class="card"><div class="card-title">📊 Divisão</div><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+            <div class="card"><div class="card-title">Distribuição por Origem</div><div style="height: 200px"><canvas id="pieChart"></canvas></div></div>
         </div>
 
         <div class="center-column">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('semana')" id="tab-semana">Semana Atual</div>
-                <div class="tab" onclick="switchTab('mes')" id="tab-mes">Mês Vigente</div>
+                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">Próximos Créditos</div>
+                <div class="tab" onclick="switchTab('historico')" id="tab-historico">Histórico (Passados)</div>
             </div>
             <div id="list-container"></div>
         </div>
 
         <div class="right-column">
-            <div class="card"><div class="card-title">📈 Evolução Diária</div><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+            <div class="card"><div class="card-title">Tendência de Recebimento</div><div style="height: 200px"><canvas id="barChart"></canvas></div></div>
             <div class="card">
-                <div class="card-title">📲 Compartilhamento</div>
-                <div class="msg-box" id="msg-preview">Aguardando...</div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                    <button class="btn btn-outline" onclick="copyMessage()">Copiar</button>
-                    <button class="btn btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
-                </div>
+                <div class="card-title">Resumo WhatsApp</div>
+                <div id="msg-preview" style="font-family: monospace; font-size: 0.75rem; background: #0f172a; color: #10b981; padding: 10px; border-radius: 8px; margin-bottom: 10px; white-space: pre-wrap;"></div>
+                <button class="btn btn-primary" onclick="sendWhatsApp()" style="background: #25d366">Enviar para o Grupo</button>
             </div>
-            <button class="btn btn-outline admin-only" onclick="clearAll()" style="color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">🗑️ Limpar Nuvem</button>
         </div>
     </div>
 </div>
@@ -138,250 +123,197 @@
     const SUPABASE_URL = 'https://glmyblygbvhpluwncbtm.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsbXlibHlnYnZocGx1d25jYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDY2MTQsImV4cCI6MjA5MTEyMjYxNH0.PqdwEYVYXIvOh2pYqQwaq8eyf2ZWS6BalQzOpINrXts';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const SENHA_MESTRE = "Murrilho123*";
-    let isAdmin = false;
-
+    
     let entries = [];
-    let currentTheme = localStorage.getItem('theme') || 'dark';
-    let currentTab = 'semana';
+    let isAdmin = false;
+    let currentTab = 'proximos';
     let openDays = {};
     let pieChart, barChart;
 
     async function init() {
-        // CHECA SE É ADMIN PELA URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('admin') === 'true') {
-            const senha = prompt("Modo Administrativo detectado. Digite a senha:");
+            const senha = prompt("Senha Admin:");
             if (senha === SENHA_MESTRE) {
                 isAdmin = true;
                 document.body.classList.add('is-admin');
-            } else {
-                alert("Senha incorreta. Acesso como visitante.");
-                // Remove o param da URL para não ficar pedindo senha no refresh
-                window.history.replaceState({}, document.title, window.location.pathname);
             }
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
 
-        const savedLogo = localStorage.getItem('app_logo');
-        const logoImg = document.getElementById('main-logo');
-        if (savedLogo && logoImg) logoImg.src = savedLogo;
-        
-        applyTheme(currentTheme);
+        document.getElementById('input-date').valueAsDate = new Date();
         initCharts();
-        
-        const dateInput = document.getElementById('input-date');
-        if (dateInput) dateInput.valueAsDate = new Date();
-
-        const logoUpload = document.getElementById('logo-upload');
-        if (logoUpload) {
-            logoUpload.addEventListener('change', e => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = re => {
-                        if (logoImg) logoImg.src = re.target.result;
-                        localStorage.setItem('app_logo', re.target.result);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
         await fetchEntries();
     }
 
     async function fetchEntries() {
         showLoading(true);
-        try {
-            const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
-            if (!error) { entries = data; render(); }
-        } catch (e) { console.error("Erro ao buscar dados:", e); }
+        const { data } = await _supabase.from('entries').select('*').order('date', { ascending: true });
+        entries = data || [];
+        render();
         showLoading(false);
     }
 
-    document.getElementById('entry-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if(!isAdmin) return;
-
-        showLoading(true);
-        const id = document.getElementById('edit-id').value;
-        const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
-        const entryData = {
-            date: document.getElementById('input-date').value,
-            seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
-            value: val,
-            desc: document.getElementById('input-desc').value
-        };
-        if (id) await _supabase.from('entries').update(entryData).eq('id', id);
-        else await _supabase.from('entries').insert([entryData]);
-        resetForm(); await fetchEntries();
-    });
-
     function render() {
-        const { start, end } = getWeekRange();
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
+        const hojeStr = new Date().toISOString().split('T')[0];
+        const hojeDate = new Date(hojeStr + 'T12:00:00');
+        
+        let somaHoje = 0, somaSemanaFutura = 0, somaMesTotal = 0, somaBruto = 0;
+        let segTotals = {}; let dailyTotals = {};
 
-        let totalSemana = 0; let totalMes = 0; let segTotals = {}; let dailyTotals = {};
+        // Lógica de Datas para a Semana
+        const { start, end } = getWeekRange();
 
         entries.forEach(e => {
-            const d = new Date(e.date + 'T12:00:00');
-            if (d >= start && d <= end) totalSemana += e.value;
-            if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) totalMes += e.value;
-            segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
+            const dStr = e.date;
+            const d = new Date(dStr + 'T12:00:00');
+            
+            somaBruto += e.value;
+            
+            // 1. Hoje
+            if (dStr === hojeStr) somaHoje += e.value;
+            
+            // 2. Futuro na Semana (Hoje inclusive até fim da semana)
+            if (d >= hojeDate && d <= end) somaSemanaFutura += e.value;
+
+            // 3. Mês Inteiro
+            if (d.getMonth() === hojeDate.getMonth() && d.getFullYear() === hojeDate.getFullYear()) {
+                somaMesTotal += e.value;
+            }
+
+            // Gráficos e Agrupamentos
+            if (d >= hojeDate) {
+                segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
+                dailyTotals[dStr] = (dailyTotals[dStr] || 0) + e.value;
+            }
         });
 
-        document.getElementById('stat-total-semana').innerText = formatCurrency(totalSemana);
-        document.getElementById('stat-total-mes').innerText = formatCurrency(totalMes);
-        document.getElementById('stat-count').innerText = entries.length;
-        const topSeg = Object.entries(segTotals).sort((a,b) => b[1]-a[1])[0];
-        document.getElementById('stat-top-seguradora').innerText = topSeg ? topSeg[0] : '-';
+        // Atualiza Cards
+        document.getElementById('stat-hoje').innerText = formatCurrency(somaHoje);
+        document.getElementById('stat-semana-futura').innerText = formatCurrency(somaSemanaFutura);
+        document.getElementById('stat-mes-total').innerText = formatCurrency(somaMesTotal);
+        document.getElementById('stat-bruto').innerText = formatCurrency(somaBruto);
 
-        if(pieChart) {
-            pieChart.data.labels = Object.keys(segTotals);
-            pieChart.data.datasets[0].data = Object.values(segTotals);
-            pieChart.update();
-        }
-
-        const filtered = entries.filter(e => {
-            const d = new Date(e.date + 'T12:00:00');
-            return currentTab === 'semana' ? (d >= start && d <= end) : (d.getMonth() === currentMonth);
-        });
-
+        // Filtra lista por aba
+        const filtered = entries.filter(e => currentTab === 'proximos' ? e.date >= hojeStr : e.date < hojeStr);
         const groups = {};
         filtered.forEach(e => {
             if (!groups[e.date]) groups[e.date] = [];
             groups[e.date].push(e);
-            dailyTotals[e.date] = (dailyTotals[e.date] || 0) + e.value;
         });
 
-        if(barChart) {
-            barChart.data.labels = Object.keys(dailyTotals).map(d => d.split('-').reverse().slice(0,2).join('/'));
-            barChart.data.datasets[0].data = Object.values(dailyTotals);
-            barChart.update();
-        }
-
+        // Renderiza Lista
         const listCont = document.getElementById('list-container');
-        listCont.innerHTML = filtered.length ? '' : '<div style="text-align:center;padding:20px;color:var(--text-muted)">Sem lançamentos.</div>';
-        
-        Object.keys(groups).sort().forEach(date => {
+        listCont.innerHTML = '';
+        Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const dayTotal = groups[date].reduce((s, x) => s + x.value, 0);
+            const isToday = date === hojeStr;
             const dayDiv = document.createElement('div');
-            dayDiv.className = `day-group ${openDays[date] ? 'active' : ''}`;
+            dayDiv.className = `day-group ${openDays[date] || isToday ? 'active' : ''}`;
             dayDiv.innerHTML = `
-                <div class="day-header" onclick="toggleDay('${date}')">
-                    <h4>${date.split('-').reverse().join('/')}</h4>
-                    <span style="font-weight:800">${formatCurrency(dayTotal)}</span>
+                <div class="day-header" onclick="toggleDay('${date}')" style="${isToday ? 'border-left: 4px solid var(--success)' : ''}">
+                    <span style="font-weight:800">${isToday ? '⭐ HOJE' : date.split('-').reverse().slice(0,2).join('/')}</span>
+                    <span style="font-weight:800; color: var(--success)">${formatCurrency(dayTotal)}</span>
                 </div>
                 <div class="day-content">
                     ${groups[date].map(e => `
                         <div class="entry-row">
-                            <span><b>${e.seguradora}</b>: ${e.desc || '-'}</span>
-                            <div>
-                                <span>${formatCurrency(e.value)}</span>
+                            <span><b>${e.seguradora}</b> ${e.desc ? '- ' + e.desc : ''}</span>
+                            <span>${formatCurrency(e.value)} 
                                 <button onclick="editEntry(${e.id})" class="admin-inline" style="border:none;background:none;cursor:pointer;margin-left:10px">✏️</button>
                                 <button onclick="deleteEntry(${e.id})" class="admin-inline" style="border:none;background:none;cursor:pointer">🗑️</button>
-                            </div>
+                            </span>
                         </div>
                     `).join('')}
                 </div>`;
             listCont.appendChild(dayDiv);
         });
-        generateMessage(totalSemana);
+
+        updateCharts(segTotals, dailyTotals);
+        generateMessage(somaHoje, somaSemanaFutura);
     }
 
-    function toggleDay(d) { openDays[d] = !openDays[d]; render(); }
+    // Funções de Suporte
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
-    function getWeekRange() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const start = new Date(now.setDate(diff)); start.setHours(0,0,0,0); const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999); return { start, end }; }
-    function toggleTheme() { currentTheme = currentTheme === 'light' ? 'dark' : 'light'; applyTheme(currentTheme); localStorage.setItem('theme', currentTheme); }
-    function applyTheme(t) { document.body.setAttribute('data-theme', t); document.getElementById('theme-btn').innerText = t === 'light' ? '🌙' : '☀️'; }
-    function switchTab(t) { currentTab = t; document.getElementById('tab-semana').classList.toggle('active', t==='semana'); document.getElementById('tab-mes').classList.toggle('active', t==='mes'); render(); }
-    function resetForm() { document.getElementById('entry-form').reset(); document.getElementById('edit-id').value = ''; document.getElementById('submit-btn').innerText = "Adicionar"; document.getElementById('cancel-edit').style.display = "none"; document.getElementById('input-date').valueAsDate = new Date(); }
+    function toggleDay(d) { openDays[d] = !openDays[d]; render(); }
+    function switchTab(t) { currentTab = t; document.querySelectorAll('.tab').forEach(el => el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); render(); }
     
-    async function deleteEntry(id) { 
-        if(!isAdmin) return;
-        if (confirm('Excluir da nuvem?')) { 
-            await _supabase.from('entries').delete().eq('id', id); 
-            fetchEntries(); 
-        } 
+    function getWeekRange() { 
+        const now = new Date(); 
+        const day = now.getDay(); 
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1); 
+        const start = new Date(now.setDate(diff)); start.setHours(0,0,0,0);
+        const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999);
+        return { start, end };
     }
 
-    function editEntry(id) { 
-        if(!isAdmin) return;
-        const e = entries.find(x => x.id == id); 
+    // Ações de Banco
+    document.getElementById('entry-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showLoading(true);
+        const id = document.getElementById('edit-id').value;
+        const val = parseFloat(document.getElementById('input-value').value.replace(/\D/g, '')) / 100;
+        const data = {
+            date: document.getElementById('input-date').value,
+            seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
+            value: val,
+            desc: document.getElementById('input-desc').value
+        };
+        if (id) await _supabase.from('entries').update(data).eq('id', id);
+        else await _supabase.from('entries').insert([data]);
+        document.getElementById('entry-form').reset();
+        document.getElementById('edit-id').value = '';
+        await fetchEntries();
+    });
+
+    async function deleteEntry(id) { if(confirm('Excluir previsão?')) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
+
+    function editEntry(id) {
+        const e = entries.find(x => x.id == id);
         document.getElementById('edit-id').value = e.id;
         document.getElementById('input-date').value = e.date;
         document.getElementById('input-seguradora').value = e.seguradora;
         document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         document.getElementById('input-desc').value = e.desc;
-        document.getElementById('submit-btn').innerText = "Salvar Alteração";
-        document.getElementById('cancel-edit').style.display = "block";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo(0,0);
     }
 
-    function exportData() {
-        if(!isAdmin) return;
-        const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_resgate_cloud.json`; a.click();
-    }
-
-    function importData() {
-        if(!isAdmin) return;
-        const input = document.createElement('input'); input.type = 'file';
-        input.onchange = e => {
-            const reader = new FileReader();
-            reader.onload = async re => {
-                try {
-                    const data = JSON.parse(re.target.result);
-                    showLoading(true);
-                    for (const item of data) {
-                        delete item.id;
-                        await _supabase.from('entries').insert([item]);
-                    }
-                    alert('Dados importados para a nuvem!'); fetchEntries();
-                } catch(err) { alert('Erro no arquivo!'); showLoading(false); }
-            };
-            reader.readAsText(e.target.files[0]);
-        };
-        input.click();
-    }
-
-    async function clearAll() { 
-        if(!isAdmin) return;
-        if (confirm('Apagar TUDO da Nuvem?')) { 
-            await _supabase.from('entries').delete().neq('id', 0); 
-            fetchEntries(); 
-        } 
-    }
-
-    function initCharts() {
-        const ctxPie = document.getElementById('pieChart');
-        const ctxBar = document.getElementById('barChart');
-        if(ctxPie && ctxBar) {
-            pieChart = new Chart(ctxPie, { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } } });
-            barChart = new Chart(ctxBar, { type: 'bar', data: { labels: [], datasets: [{ label: 'R$', data: [], backgroundColor: '#e11d48' }] }, options: { maintainAspectRatio: false, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } } });
-        }
-    }
-
-    function generateMessage(total) {
-        let msg = "📊 *PREVISÃO RESGATE 116*\n\n";
-        msg += `💰 *Total previsto da semana:* ${formatCurrency(total)}`;
+    // WhatsApp
+    function generateMessage(hoje, semana) {
+        const msg = `📊 *PREVISÃO CRÉDITOS - RESGATE 116*\n\n💰 *Entrada Hoje:* ${formatCurrency(hoje)}\n📅 *Restante da Semana:* ${formatCurrency(semana)}\n\n_Confira os detalhes no painel cloud._`;
         document.getElementById('msg-preview').innerText = msg;
     }
-    function copyMessage() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert('Copiado!')); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
+    // Gráficos
+    function initCharts() {
+        const commonOptions = { maintainAspectRatio: false, plugins: { legend: { display: false } } };
+        pieChart = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b'] }] }, options: commonOptions });
+        barChart = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: [], datasets: [{ data: [], backgroundColor: '#e11d48' }] }, options: commonOptions });
+    }
+    function updateCharts(seg, daily) {
+        pieChart.data.labels = Object.keys(seg);
+        pieChart.data.datasets[0].data = Object.values(seg);
+        pieChart.update();
+        barChart.data.labels = Object.keys(daily).map(d => d.split('-').reverse().slice(0,2).join('/'));
+        barChart.data.datasets[0].data = Object.values(daily);
+        barChart.update();
+    }
+
+    // Máscara de Moeda
     document.getElementById('input-value').addEventListener('input', e => {
         let v = e.target.value.replace(/\D/g, '');
-        v = (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        e.target.value = v;
+        e.target.value = (v/100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        init();
-    });
+    function toggleTheme() {
+        const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', t);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
