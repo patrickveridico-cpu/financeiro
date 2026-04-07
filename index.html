@@ -12,65 +12,118 @@
     <style>
         :root {
             --primary: #e11d48; --success: #10b981; --whatsapp: #25d366; 
-            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
-            --text-muted: #94a3b8; --border: #334155;
+            --bg: #0b0e14; --card-bg: rgba(30, 41, 59, 0.7); --text-main: #f8fafc;
+            --text-muted: #94a3b8; --border: rgba(51, 65, 85, 0.8);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
+        /* FUNDO COM TEXTURA ESTILOSA */
+        body { 
+            background-color: var(--bg); 
+            background-image: 
+                radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0),
+                radial-gradient(circle at 50% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 50%);
+            background-size: 40px 40px, 100% 100%;
+            color: var(--text-main); 
+            padding: 20px; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; cursor: default; }
+
+        /* EFEITO DE CURSOR E CLIQUE */
+        .clickable, button, .day-header, .tab, .action-icons span, input, .logo-img { 
+            cursor: pointer !important; 
+        }
+        
+        .clickable:active, button:active { transform: scale(0.95); transition: 0.1s; }
+
+        .container { max-width: 1400px; margin: 0 auto; position: relative; z-index: 1; }
 
         /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 60px; }
-        .brand-info h1 { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
+        header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 25px; padding: 20px 30px; 
+            background: var(--card-bg); backdrop-filter: blur(10px);
+            border-radius: 20px; border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .logo-container { display: flex; align-items: center; gap: 20px; }
+        .logo-img { height: 75px; filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.3)); }
+        .brand-info h1 { font-size: 1.4rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+        .brand-info p { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
 
-        /* STATS DESTAQUE */
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
-        .stat-card.highlight-hoje { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.05); }
-        .stat-card.highlight-restante { border: 2px solid var(--primary); background: rgba(225, 29, 72, 0.05); }
+        /* STATS COM DESTAQUE MÁXIMO */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { 
+            background: var(--card-bg); padding: 25px; border-radius: 20px; 
+            border: 1px solid var(--border); backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card.highlight-hoje { 
+            border: 2px solid var(--success); 
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.1), transparent);
+            transform: translateY(-5px);
+        }
+        .stat-card.highlight-restante { 
+            border: 2px solid var(--primary); 
+            box-shadow: 0 0 20px rgba(225, 29, 72, 0.2);
+            background: linear-gradient(145deg, rgba(225, 29, 72, 0.1), transparent);
+            transform: translateY(-5px);
+        }
         
-        .stat-card h3 { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
-        .stat-card .value { font-size: 1.6rem; font-weight: 900; }
+        .stat-card h3 { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 900; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; }
+        /* GRID PRINCIPAL */
+        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 25px; }
 
-        /* CARDS */
-        .card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; color: var(--primary); text-transform: uppercase; }
+        .card { 
+            background: var(--card-bg); padding: 20px; border-radius: 18px; 
+            border: 1px solid var(--border); margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .card-title { font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
         
-        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: white; margin-bottom: 12px; outline: none; }
-        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer !important; border: none; width: 100%; font-size: 0.8rem; }
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-whatsapp { background: var(--whatsapp); color: white; margin-top: 10px; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: rgba(15, 23, 42, 0.8); color: white; margin-bottom: 12px; outline: none; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2); }
 
-        /* LISTA SANFONA */
-        .day-group { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+        .btn { padding: 14px; border-radius: 10px; font-weight: 700; border: none; width: 100%; font-size: 0.85rem; transition: 0.2s; color: white; }
+        .btn-primary { background: var(--primary); box-shadow: 0 4px 15px rgba(225, 29, 72, 0.3); }
+        .btn-whatsapp { background: var(--whatsapp); box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2); margin-top: 10px; }
+
+        /* LISTA SANFONA ACORDEÃO */
+        .day-group { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
         .day-header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 20px; cursor: pointer !important; background: var(--card-bg);
+            padding: 18px 20px; background: rgba(30, 41, 59, 0.5);
+            transition: 0.3s;
         }
         .day-header:hover { background: rgba(255,255,255,0.05); }
-        .day-total { color: var(--success); font-weight: 800; font-size: 1.1rem; }
+        .day-total { color: var(--success); font-weight: 800; font-size: 1.15rem; text-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
 
-        .day-content { display: none; padding: 10px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-        .day-group.active .day-content { display: block; }
+        .day-content { display: none; padding: 10px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.3); }
+        .day-group.active .day-content { display: block; animation: slideDown 0.3s ease-out; }
+        .day-group.active .day-header { border-left: 6px solid var(--primary); background: rgba(225, 29, 72, 0.05); }
 
-        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
-        .action-icons span { cursor: pointer !important; margin-left: 10px; font-size: 1.1rem; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .action-icons span { margin-left: 12px; font-size: 1.2rem; transition: 0.2s; }
+        .action-icons span:hover { transform: scale(1.2); }
 
         /* WHATSAPP PREVIEW */
         .msg-preview { 
-            background: #0b141a; color: #e9edef; padding: 15px; border-radius: 10px; 
-            font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; 
-            border: 1px dashed var(--border); margin-bottom: 10px;
+            background: #0b141a; color: #e9edef; padding: 20px; border-radius: 12px; 
+            font-family: 'Courier New', monospace; font-size: 0.9rem; white-space: pre-wrap; 
+            border: 1px dashed var(--border); margin-bottom: 12px; line-height: 1.4;
         }
 
-        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer !important; background: var(--border); border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
-        .tab.active { background: var(--primary); color: white; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab { flex: 1; text-align: center; padding: 12px; background: var(--border); border-radius: 10px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); transition: 0.3s; }
+        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(225, 29, 72, 0.2); }
     </style>
 </head>
 <body>
@@ -78,15 +131,16 @@
 <div class="container">
     <header>
         <div class="logo-container">
-            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x60?text=RESGATE+116'">
+            <img src="logo-resgate.png" class="logo-img" alt="Resgate 116" onerror="this.src='https://via.placeholder.com/180x80/1e293b/e11d48?text=RESGATE+116'">
             <div class="brand-info">
                 <h1>GRUPO RESGATE 116</h1>
-                <p>Site por Patrick Almeida</p>
+                <p>Criado por Patrick de Almeida</p>
             </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="btn" style="width:auto; background:var(--border); color:white" onclick="fetchEntries()">🔄 Sincronizar</button>
-            <button class="btn" style="width:auto; background:var(--primary); color:white" onclick="exportData()">📥 Backup</button>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn clickable" style="width:auto; background:var(--border);" onclick="fetchEntries()">🔄 Sincronizar</button>
+            <button class="btn clickable" style="width:auto; background:var(--primary);" onclick="exportData()">📥 Exportar Backup</button>
+            <button class="btn clickable" style="width:auto; background:none; border:1px solid var(--border);" onclick="importData()">📤 Importar Backup</button>
         </div>
     </header>
 
@@ -94,40 +148,42 @@
         <div class="stat-card highlight-hoje"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color:var(--success)">R$ 0,00</div></div>
         <div class="stat-card highlight-restante"><h3>Restante do Mês</h3><div class="value" id="stat-restante" style="color:var(--primary)">R$ 0,00</div></div>
         <div class="stat-card"><h3>Já Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Total Mês</h3><div class="value" id="stat-total">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Total Programado</h3><div class="value" id="stat-total">R$ 0,00</div></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="left-column">
             <div class="card">
-                <div class="card-title">➕ Novo Lançamento</div>
+                <div class="card-title"><span>➕</span> Lançar Crédito</div>
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
-                    <input type="date" id="input-date" required>
-                    <input type="text" id="input-seguradora" placeholder="Seguradora" required>
-                    <input type="text" id="input-value" placeholder="Valor 0,00" required>
-                    <input type="text" id="input-desc" placeholder="NF / Observação">
-                    <button type="submit" id="btn-submit" class="btn btn-primary">LANÇAR CRÉDITO</button>
+                    <label style="font-size: 0.7rem; color:var(--text-muted); margin-bottom: 5px; display:block">Data do Crédito</label>
+                    <input type="date" id="input-date" class="clickable" required>
+                    <input type="text" id="input-seguradora" placeholder="Nome da Seguradora" required>
+                    <input type="text" id="input-value" placeholder="Valor R$ 0,00" required>
+                    <input type="text" id="input-desc" placeholder="NF ou Observação">
+                    <button type="submit" id="btn-submit" class="btn btn-primary clickable">CADASTRAR NO SISTEMA</button>
+                    <button type="button" id="btn-cancel" class="btn clickable" style="display:none; margin-top:10px; background:none; border:1px solid var(--border);" onclick="resetForm()">CANCELAR</button>
                 </form>
             </div>
-            <div class="card"><div class="card-title">Divisão de Carteira</div><div style="height:200px"><canvas id="pieChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><span>📊</span> Distribuição</div><div style="height:180px"><canvas id="pieChart"></canvas></div></div>
         </div>
 
         <div class="center-column">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PROGRAMADOS</div>
-                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
+                <div class="tab active clickable" onclick="switchTab('proximos')" id="tab-proximos">RECEBIMENTOS PROGRAMADOS</div>
+                <div class="tab clickable" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
             <div id="list-container"></div>
         </div>
 
         <div class="right-column">
-            <div class="card"><div class="card-title">Volume Diário</div><div style="height:200px"><canvas id="barChart"></canvas></div></div>
+            <div class="card"><div class="card-title"><span>📈</span> Fluxo Semanal</div><div style="height:180px"><canvas id="barChart"></canvas></div></div>
             <div class="card">
-                <div class="card-title">Resumo WhatsApp</div>
-                <div id="msg-preview" class="msg-preview">Aguardando dados...</div>
-                <button class="btn btn-whatsapp" onclick="sendWhatsApp()">🚀 ENVIAR AO GRUPO</button>
-                <button class="btn" style="background:var(--border); color:white; margin-top:8px" onclick="copyToClipboard()">📋 COPIAR</button>
+                <div class="card-title"><span>📱</span> Resumo WhatsApp</div>
+                <div id="msg-preview" class="msg-preview">Carregando dados...</div>
+                <button class="btn btn-whatsapp clickable" onclick="sendWhatsApp()">🚀 ENVIAR PARA O GRUPO</button>
+                <button class="btn clickable" style="background:var(--border); margin-top:10px" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
             </div>
         </div>
     </div>
@@ -182,7 +238,7 @@
             const div = document.createElement('div');
             div.className = `day-group ${openDays[date] ? 'active' : ''}`;
             div.innerHTML = `
-                <div class="day-header" onclick="toggleDay('${date}')">
+                <div class="day-header clickable" onclick="toggleDay('${date}')">
                     <span>📅 <b>${date.split('-').reverse().slice(0,2).join('/')}</b></span>
                     <span class="day-total">${formatCurrency(totalDia)}</span>
                 </div>
@@ -192,8 +248,8 @@
                             <span><b>${e.seguradora}</b> <small style="color:var(--text-muted)">${e.desc || ''}</small></span>
                             <div class="action-icons">
                                 <b>${formatCurrency(e.value)}</b>
-                                <span onclick="editEntry(${e.id})">✏️</span>
-                                <span onclick="deleteEntry(${e.id})">🗑️</span>
+                                <span class="clickable" onclick="editEntry(${e.id})">✏️</span>
+                                <span class="clickable" onclick="deleteEntry(${e.id})">🗑️</span>
                             </div>
                         </div>
                     `).join('')}
@@ -223,7 +279,6 @@
         document.getElementById('msg-preview').innerText = msg;
     }
 
-    // CRUD
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('edit-id').value;
@@ -236,9 +291,7 @@
         };
         if (id) await _supabase.from('entries').update(data).eq('id', id);
         else await _supabase.from('entries').insert([data]);
-        document.getElementById('entry-form').reset();
-        document.getElementById('edit-id').value = '';
-        fetchEntries();
+        resetForm(); fetchEntries();
     });
 
     function editEntry(id) {
@@ -248,11 +301,24 @@
         document.getElementById('input-seguradora').value = e.seguradora;
         document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         document.getElementById('input-desc').value = e.desc || '';
+        document.getElementById('btn-submit').innerText = "ATUALIZAR DADOS";
+        document.getElementById('btn-cancel').style.display = "block";
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function deleteEntry(id) {
-        if(confirm('Excluir?')) { await _supabase.from('entries').delete().eq(id, id); fetchEntries(); }
+        if(confirm('Excluir lançamento permanentemente?')) {
+            await _supabase.from('entries').delete().eq('id', id);
+            fetchEntries();
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('entry-form').reset();
+        document.getElementById('edit-id').value = '';
+        document.getElementById('btn-submit').innerText = "CADASTRAR NO SISTEMA";
+        document.getElementById('btn-cancel').style.display = "none";
+        document.getElementById('input-date').valueAsDate = new Date();
     }
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
@@ -261,21 +327,42 @@
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'doughnut',
-            data: { labels: Object.keys(segData), datasets: [{ data: Object.values(segData), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] },
-            options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            data: { labels: Object.keys(segData), datasets: [{ data: Object.values(segData), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'], borderWidth: 0 }] },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
         });
         if (barChart) barChart.destroy();
         const lastDays = Object.keys(dailyData).sort().slice(-7);
         barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
-            data: { labels: lastDays.map(d => d.split('-').reverse().slice(0,2).join('/')), datasets: [{ label: 'R$', data: lastDays.map(d => dailyData[d]), backgroundColor: '#e11d48' }] },
+            data: { labels: lastDays.map(d => d.split('-').reverse().slice(0,2).join('/')), datasets: [{ label: 'R$', data: lastDays.map(d => dailyData[d]), backgroundColor: '#e11d48', borderRadius: 6 }] },
             options: { maintainAspectRatio: false, scales: { y: { display: false }, x: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }
         });
     }
 
     function switchTab(t) { currentTab = t; render(); }
-    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert("Copiado!")); }
+    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert("Resumo copiado!")); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
+
+    function exportData() {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(entries)], { type: 'application/json' }));
+        a.download = 'backup_financeiro_resgate.json'; a.click();
+    }
+
+    function importData() {
+        const input = document.createElement('input'); input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = async re => {
+                const data = JSON.parse(re.target.result);
+                alert("Importando dados... isso pode levar alguns segundos.");
+                for (const item of data) { delete item.id; await _supabase.from('entries').insert([item]); }
+                fetchEntries();
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    }
 
     document.getElementById('input-value').addEventListener('input', e => {
         let v = e.target.value.replace(/\D/g, '');
