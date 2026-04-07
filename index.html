@@ -82,21 +82,21 @@
             <div class="header-actions">
                 <button class="btn btn-outline" onclick="toggleTheme()">🌓 TEMA</button>
                 <button class="btn btn-outline" onclick="exportData()">EXPORTAR</button>
-                <button class="btn btn-primary" onclick="fetchEntries()">🔄 ATUALIZAR</button>
+                <button class="btn btn-primary" onclick="fetchEntries()">🔄 SINCRONIZAR</button>
             </div>
         </header>
 
         <div class="stats-grid">
-            <div class="stat-card destaque-amarelo"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
-            <div class="stat-card destaque-amarelo"><h3>Restante Mês</h3><div class="value" id="stat-restante" style="color: var(--success)">R$ 0,00</div></div>
-            <div class="stat-card"><h3>Já Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
-            <div class="stat-card"><h3>Total Bruto</h3><div class="value" id="stat-total" style="color: var(--primary)">R$ 0,00</div></div>
+            <div class="stat-card destaque-amarelo"><h3>Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
+            <div class="stat-card destaque-amarelo"><h3>Restante</h3><div class="value" id="stat-restante" style="color: var(--success)">R$ 0,00</div></div>
+            <div class="stat-card"><h3>Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
+            <div class="stat-card"><h3>Total</h3><div class="value" id="stat-total" style="color: var(--primary)">R$ 0,00</div></div>
         </div>
 
         <div class="dashboard-grid">
             <div class="left-column">
                 <div class="card" id="form-card" style="display: none;">
-                    <div style="font-weight: 900; margin-bottom: 20px; text-transform: uppercase; color: var(--primary);">➕ Lançar Crédito</div>
+                    <div style="font-weight: 900; margin-bottom: 20px; text-transform: uppercase; color: var(--primary);">➕ Novo Lançamento</div>
                     <form id="entry-form">
                         <input type="hidden" id="edit-id">
                         <input type="date" id="input-date" required>
@@ -117,7 +117,6 @@
             </div>
             
             <div class="center-column">
-                <div style="font-weight: 900; margin-bottom: 15px; opacity: 0.8; font-size: 0.8rem; text-transform: uppercase;">📅 Agenda de Recebimentos</div>
                 <div id="list-container"></div>
             </div>
             
@@ -138,7 +137,7 @@
         const isAdmin = urlParams.get('admin') === 'true';
         if (isAdmin) document.getElementById('form-card').style.display = 'block';
 
-        // Cursor
+        // Custom Cursor
         window.addEventListener('mousemove', (e) => {
             document.getElementById('cursor-dot').style.left = e.clientX + 'px';
             document.getElementById('cursor-dot').style.top = e.clientY + 'px';
@@ -199,7 +198,7 @@
             document.getElementById('stat-liquidados').innerText = formatCurrency(sLiq);
             document.getElementById('stat-total').innerText = formatCurrency(sTotal);
 
-            // Feed Principal
+            // Render Feed Central (Próximos)
             Object.keys(groups).sort().forEach(date => {
                 const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
                 const div = document.createElement('div');
@@ -226,7 +225,7 @@
                 listCont.appendChild(div);
             });
 
-            // Histórico
+            // Render Histórico (Já pagos)
             historyItems.sort((a,b) => b.date.localeCompare(a.date)).forEach(e => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
@@ -268,7 +267,7 @@
             });
         }
 
-        function copyText() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText); alert("Copiado!"); }
+        function copyText() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText); alert("Resumo Copiado!"); }
         function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
         async function exportData() {
@@ -284,7 +283,7 @@
 
         document.getElementById('entry-form').onsubmit = async (e) => {
             e.preventDefault();
-            if(prompt("Senha:") !== MASTER_PASS) return;
+            if(prompt("Confirmação de Segurança - Senha Admin:") !== MASTER_PASS) return;
             const id = document.getElementById('edit-id').value;
             const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
             const data = {
@@ -310,7 +309,7 @@
         }
 
         async function deleteEntry(id) { 
-            if(confirm('Tem certeza que deseja excluir este lançamento?') && prompt("Confirme a Senha Admin:") === MASTER_PASS) { 
+            if(confirm('Tem certeza que deseja apagar este registro?') && prompt("Confirme a Senha Admin para APAGAR:") === MASTER_PASS) { 
                 await _supabase.from('entries').delete().eq('id', id); 
                 fetchEntries(); 
             } 
