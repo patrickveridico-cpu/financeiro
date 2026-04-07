@@ -22,13 +22,7 @@
         body { background: var(--bg); color: var(--text-main); padding: 20px; transition: 0.3s; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; }
 
-        .glass-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            transition: transform 0.2s;
-        }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; }
 
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
         .logo-area { display: flex; align-items: center; gap: 15px; }
@@ -50,18 +44,19 @@
         .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
         .tab.active { background: var(--primary); color: white; }
 
-        /* Lista Interativa */
         .day-group { margin-bottom: 8px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: var(--card-bg); }
         .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; transition: 0.2s; }
         .day-header:hover { background: rgba(225, 29, 72, 0.1); }
         .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.1); }
         .day-group.active .day-content { display: block; }
         
-        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.2); color: white; margin-bottom: 10px; }
-        .btn { padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; }
+        /* Inputs e Calendário */
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.3); color: white; margin-bottom: 10px; color-scheme: dark; }
+        .btn { padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-icon { width: 40px; padding: 0; background: var(--card-bg); border: 1px solid var(--border); color: white; }
 
-        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; }
+        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; min-height: 100px; }
     </style>
 </head>
 <body data-theme="dark">
@@ -72,12 +67,14 @@
             <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
             <div class="brand-info">
                 <h1 style="font-size: 1.1rem; color: var(--primary);">GRUPO RESGATE 116</h1>
-                <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600;">Site criado por Patrick Almeida</div>
+                <div style="font-size: 0.65rem; color: var(--text-muted);">Site criado por Patrick Almeida</div>
             </div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn glass-card" onclick="toggleTheme()" style="width: 40px; padding:0">🌓</button>
-            <button class="btn glass-card" onclick="fetchEntries()" style="width: 40px; padding:0">🔄</button>
+            <button class="btn btn-icon admin-only" onclick="exportData()" title="Exportar JSON">📤</button>
+            <button class="btn btn-icon admin-only" onclick="importData()" title="Importar JSON">📥</button>
+            <button class="btn btn-icon" onclick="toggleTheme()">🌓</button>
+            <button class="btn btn-icon" onclick="fetchEntries()">🔄</button>
         </div>
     </header>
 
@@ -96,7 +93,8 @@
                     <input type="date" id="input-date" required>
                     <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
                     <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
-                    <button type="submit" class="btn btn-primary">AGENDAR</button>
+                    <input type="text" id="input-obs" placeholder="NOTA FISCAL / OBS">
+                    <button type="submit" class="btn btn-primary">AGENDAR ENTRADA</button>
                 </form>
             </div>
             <div class="card glass-card">
@@ -117,7 +115,7 @@
             <div class="card glass-card">
                 <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
                 <div id="msg-preview"></div>
-                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; margin-top: 15px;">ENVIAR GRUPO</button>
+                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; margin-top: 15px;">ENVIAR PARA O GRUPO</button>
             </div>
         </div>
     </div>
@@ -150,7 +148,6 @@
 
         entries.forEach(e => {
             const d = new Date(e.date + 'T12:00:00');
-            
             if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) {
                 somaTotalMes += e.value;
                 if (e.date >= hoje) {
@@ -184,7 +181,13 @@
                     <span style="color:var(--success); font-weight:800">${formatCurrency(totalDia)}</span>
                 </div>
                 <div class="day-content">
-                    ${groups[date].map(e => `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:8px 0;border-bottom:1px solid var(--border)"><span>${e.seguradora}</span><b>${formatCurrency(e.value)}</b></div>`).join('')}
+                    ${groups[date].map(e => `
+                        <div style="display:flex; justify-content:space-between; font-size:0.75rem; padding:8px 0; border-bottom:1px solid var(--border)">
+                            <span style="flex:1"><b>${e.seguradora}</b></span>
+                            <span style="flex:1; text-align:center; color:var(--text-muted)">${e.description || 'S/ NF'}</span>
+                            <span style="flex:1; text-align:right"><b>${formatCurrency(e.value)}</b></span>
+                        </div>
+                    `).join('')}
                 </div>`;
             listCont.appendChild(div);
         });
@@ -202,16 +205,16 @@
                 labels: Object.keys(data),
                 datasets: [{ data: Object.values(data), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }]
             },
-            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '75%' }
         });
     }
 
     function updateWhatsapp(valores) {
         let msg = "📊 *PROGRAMAÇÕES DA SEMANA*\n\n";
-        const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+        const diasSemana = ["Dom", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
         Object.keys(valores).sort().filter(d => d >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(date => {
             const d = new Date(date + 'T12:00:00');
-            msg += `📅 ${date.split('-').reverse().slice(0,2).join('/')} ${diasSemana[d.getDay()]} - *${formatCurrency(valores[date])}*\n`;
+            msg += `📅 ${date.split('-').reverse().slice(0,2).join('/')} (${diasSemana[d.getDay()]}) - *${formatCurrency(valores[date])}*\n`;
         });
         document.getElementById('msg-preview').innerText = msg;
     }
@@ -220,6 +223,34 @@
     function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
     function switchTab(t) { currentTab = t; document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); document.getElementById('tab-historico').classList.toggle('active', t==='historico'); render(); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
+
+    // Import/Export Functions
+    async function exportData() {
+        const { data } = await _supabase.from('entries').select('*');
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `backup_resgate116_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+    }
+
+    async function importData() {
+        const input = document.createElement('input');
+        input.type = 'file'; input.accept = '.json';
+        input.onchange = async e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = async event => {
+                const json = JSON.parse(event.target.result);
+                if(confirm(`Importar ${json.length} registros? Isso não apagará os atuais.`)) {
+                    await _supabase.from('entries').insert(json.map(x => ({ date: x.date, seguradora: x.seguradora, value: x.value, description: x.description })));
+                    fetchEntries();
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 
     if (new URLSearchParams(window.location.search).get('admin') === 'true') {
         if (prompt("Senha Admin:") === "Murrilho123*") document.body.classList.add('is-admin');
@@ -233,7 +264,13 @@
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const val = parseFloat(document.getElementById('input-value').value.replace(/\D/g, '')) / 100;
-        await _supabase.from('entries').insert([{ date: document.getElementById('input-date').value, seguradora: document.getElementById('input-seguradora').value.toUpperCase(), value: val }]);
+        await _supabase.from('entries').insert([{ 
+            date: document.getElementById('input-date').value, 
+            seguradora: document.getElementById('input-seguradora').value.toUpperCase(), 
+            value: val,
+            description: document.getElementById('input-obs').value.toUpperCase()
+        }]);
+        document.getElementById('entry-form').reset();
         fetchEntries();
     });
 
