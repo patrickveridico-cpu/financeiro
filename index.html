@@ -11,41 +11,28 @@
     
     <style>
         :root {
-            --primary: #e11d48;
-            --primary-hover: #be123c;
-            --success: #10b981;
-            --danger: #ef4444;
-            --whatsapp: #25d366;
-            --bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --input-bg: #ffffff;
+            --primary: #e11d48; --primary-hover: #be123c; --success: #10b981; --danger: #ef4444;
+            --whatsapp: #25d366; --bg: #f1f5f9; --card-bg: #ffffff; --text-main: #0f172a;
+            --text-muted: #64748b; --border: #e2e8f0; --input-bg: #ffffff;
             --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
-
         [data-theme="dark"] {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
-            --input-bg: #0f172a;
-            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --border: #334155; --input-bg: #0f172a; --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s, transform 0.2s; }
         body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; background-image: radial-gradient(circle at 2px 2px, var(--border) 1px, transparent 0); background-size: 40px 40px; }
         .container { max-width: 1400px; margin: 0 auto; }
         header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-container { display: flex; align-items: center; gap: 15px; cursor: pointer; position: relative; }
+        .logo-container:hover .logo-overlay { opacity: 1; }
         .logo-img { height: 55px; width: auto; max-width: 180px; object-fit: contain; }
+        .logo-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); color: white; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; border-radius: 8px; opacity: 0; transition: opacity 0.2s; }
         .brand-info h1 { font-size: 1.15rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
         .brand-info p { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); border-left: 4px solid var(--primary); }
-        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 8px; }
+        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
         .stat-card .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
         .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
         .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
@@ -61,7 +48,6 @@
         .day-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; cursor: pointer; border-left: 4px solid var(--primary); }
         .day-content { padding: 0 15px 15px 15px; display: none; border-top: 1px solid var(--border); background: var(--bg); }
         .day-group.active .day-content { display: block; }
-        .seguradora-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
         .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 5px; font-size: 0.85rem; }
         .chart-container { position: relative; height: 220px; width: 100%; }
         .msg-box { background: #0f172a; color: #10b981; padding: 15px; border-radius: 12px; font-family: monospace; white-space: pre-wrap; font-size: 0.75rem; margin-bottom: 15px; max-height: 200px; overflow-y: auto; }
@@ -73,26 +59,30 @@
 </head>
 <body data-theme="dark">
 
-<div id="loading" class="loading-overlay">Sincronizando...</div>
+<div id="loading" class="loading-overlay">Sincronizando com a Nuvem...</div>
 
 <div class="container">
     <header>
-        <div class="logo-container">
+        <div class="logo-container" onclick="document.getElementById('logo-upload').click()">
+            <div class="logo-overlay">TROCAR LOGO</div>
             <img id="main-logo" src="https://via.placeholder.com/180x60?text=GRUPO+RESGATE+116" alt="Logo" class="logo-img">
+            <input type="file" id="logo-upload" hidden accept="image/*">
             <div class="brand-info">
                 <h1>Grupo Resgate 116</h1>
-                <p>Dashboard em Tempo Real (Cloud)</p>
+                <p>Dashboard Executivo Cloud</p>
             </div>
         </div>
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-outline btn-icon" onclick="toggleTheme()" id="theme-btn">☀️</button>
             <button class="btn btn-outline btn-icon" onclick="fetchEntries()" title="Atualizar">🔄</button>
+            <button class="btn btn-outline btn-icon" onclick="exportData()" title="Backup">📥</button>
+            <button class="btn btn-outline btn-icon" onclick="importData()" title="Importar">📤</button>
         </div>
     </header>
 
     <div class="stats-grid">
-        <div class="stat-card"><h3>Total Previsto (Semana)</h3><div class="value" id="stat-total-semana">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Total Acumulado (Mês)</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Total Semana</h3><div class="value" id="stat-total-semana">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Total Mês</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
         <div class="stat-card"><h3>Top Seguradora</h3><div class="value" id="stat-top-seguradora">-</div></div>
         <div class="stat-card"><h3>Lançamentos</h3><div class="value" id="stat-count">0</div></div>
     </div>
@@ -104,10 +94,10 @@
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
                     <div class="form-group"><label>Data</label><input type="date" id="input-date" required></div>
-                    <div class="form-group"><label>Seguradora</label><input type="text" id="input-seguradora" placeholder="MONDIAL" required list="seguradoras-list"><datalist id="seguradoras-list"></datalist></div>
+                    <div class="form-group"><label>Seguradora</label><input type="text" id="input-seguradora" required list="seguradoras-list"><datalist id="seguradoras-list"></datalist></div>
                     <div class="form-group"><label>Valor (R$)</label><input type="text" id="input-value" placeholder="0,00" required></div>
-                    <div class="form-group"><label>Descrição</label><input type="text" id="input-desc" placeholder="NF097"></div>
-                    <button type="submit" class="btn btn-primary" id="submit-btn">Enviar para Nuvem</button>
+                    <div class="form-group"><label>Descrição</label><input type="text" id="input-desc"></div>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Adicionar</button>
                     <button type="button" class="btn btn-outline" id="cancel-edit" style="display: none; margin-top: 5px;" onclick="resetForm()">Cancelar</button>
                 </form>
             </div>
@@ -123,21 +113,21 @@
         </div>
 
         <div class="right-column">
-            <div class="card"><div class="card-title">📈 Evolução</div><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+            <div class="card"><div class="card-title">📈 Evolução Diária</div><div class="chart-container"><canvas id="barChart"></canvas></div></div>
             <div class="card">
-                <div class="card-title">📲 Compartilhar</div>
+                <div class="card-title">📲 Compartilhamento</div>
                 <div class="msg-box" id="msg-preview">Aguardando...</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                     <button class="btn btn-outline" onclick="copyMessage()">Copiar</button>
                     <button class="btn btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
                 </div>
             </div>
+            <button class="btn btn-outline" onclick="clearAll()" style="color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">🗑️ Limpar Nuvem</button>
         </div>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURAÇÃO SUPABASE ---
     const SUPABASE_URL = 'https://glmyblygbvhpluwncbtm.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_YrkMBRNfMg9PnEZzGERmFw_C-2MUArW';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -149,75 +139,50 @@
     let pieChart, barChart;
 
     async function init() {
+        const savedLogo = localStorage.getItem('app_logo');
+        if (savedLogo) document.getElementById('main-logo').src = savedLogo;
         applyTheme(currentTheme);
         initCharts();
         document.getElementById('input-date').valueAsDate = new Date();
         await fetchEntries();
     }
 
+    // Logo Upload
+    document.getElementById('logo-upload').addEventListener('change', e => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = re => {
+                document.getElementById('main-logo').src = re.target.result;
+                localStorage.setItem('app_logo', re.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     async function fetchEntries() {
         showLoading(true);
         const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
-        if (error) alert("Erro ao buscar dados: " + error.message);
-        else { entries = data; render(); }
+        if (!error) { entries = data; render(); }
         showLoading(false);
     }
 
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         showLoading(true);
-        
         const id = document.getElementById('edit-id').value;
         const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
-        
         const entryData = {
             date: document.getElementById('input-date').value,
             seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
             value: val,
             desc: document.getElementById('input-desc').value
         };
-
-        let result;
-        if (id) {
-            result = await _supabase.from('entries').update(entryData).eq('id', id);
-        } else {
-            result = await _supabase.from('entries').insert([entryData]);
-        }
-
-        if (result.error) alert("Erro ao salvar: " + result.error.message);
-        else { resetForm(); await fetchEntries(); }
-        showLoading(false);
+        if (id) await _supabase.from('entries').update(entryData).eq('id', id);
+        else await _supabase.from('entries').insert([entryData]);
+        resetForm(); await fetchEntries();
     });
 
-    async function deleteEntry(id) {
-        if (!confirm('Excluir do banco de dados?')) return;
-        showLoading(true);
-        const { error } = await _supabase.from('entries').delete().eq('id', id);
-        if (error) alert(error.message);
-        else await fetchEntries();
-        showLoading(false);
-    }
-
-    function editEntry(id) {
-        const e = entries.find(x => x.id == id);
-        document.getElementById('edit-id').value = e.id;
-        document.getElementById('input-date').value = e.date;
-        document.getElementById('input-seguradora').value = e.seguradora;
-        document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-        document.getElementById('input-desc').value = e.desc;
-        document.getElementById('submit-btn').innerText = "Atualizar na Nuvem";
-        document.getElementById('cancel-edit').style.display = "block";
-    }
-
-    function resetForm() {
-        document.getElementById('entry-form').reset();
-        document.getElementById('edit-id').value = '';
-        document.getElementById('submit-btn').innerText = "Enviar para Nuvem";
-        document.getElementById('cancel-edit').style.display = "none";
-        document.getElementById('input-date').valueAsDate = new Date();
-    }
-
-    // --- INTERFACE E GRÁFICOS ---
     function render() {
         const { start, end } = getWeekRange();
         const now = new Date();
@@ -236,16 +201,13 @@
         document.getElementById('stat-total-semana').innerText = formatCurrency(totalSemana);
         document.getElementById('stat-total-mes').innerText = formatCurrency(totalMes);
         document.getElementById('stat-count').innerText = entries.length;
+        const topSeg = Object.entries(segTotals).sort((a,b) => b[1]-a[1])[0];
+        document.getElementById('stat-top-seguradora').innerText = topSeg ? topSeg[0] : '-';
 
-        // Atualiza Gráficos
         pieChart.data.labels = Object.keys(segTotals);
         pieChart.data.datasets[0].data = Object.values(segTotals);
         pieChart.update();
 
-        // Renderiza lista filtrada
-        const listCont = document.getElementById('list-container');
-        listCont.innerHTML = '';
-        
         const filtered = entries.filter(e => {
             const d = new Date(e.date + 'T12:00:00');
             return currentTab === 'semana' ? (d >= start && d <= end) : (d.getMonth() === currentMonth);
@@ -262,7 +224,10 @@
         barChart.data.datasets[0].data = Object.values(dailyTotals);
         barChart.update();
 
-        for (const date in groups) {
+        const listCont = document.getElementById('list-container');
+        listCont.innerHTML = filtered.length ? '' : '<div style="text-align:center;padding:20px;color:var(--text-muted)">Sem lançamentos.</div>';
+        
+        Object.keys(groups).sort().forEach(date => {
             const dayTotal = groups[date].reduce((s, x) => s + x.value, 0);
             const dayDiv = document.createElement('div');
             dayDiv.className = `day-group ${openDays[date] ? 'active' : ''}`;
@@ -277,28 +242,68 @@
                             <span><b>${e.seguradora}</b>: ${e.desc || '-'}</span>
                             <div>
                                 <span>${formatCurrency(e.value)}</span>
-                                <button onclick="editEntry(${e.id})" style="border:none; background:none; cursor:pointer; margin-left:10px;">✏️</button>
-                                <button onclick="deleteEntry(${e.id})" style="border:none; background:none; cursor:pointer;">🗑️</button>
+                                <button onclick="editEntry(${e.id})" style="border:none;background:none;cursor:pointer;margin-left:10px">✏️</button>
+                                <button onclick="deleteEntry(${e.id})" style="border:none;background:none;cursor:pointer">🗑️</button>
                             </div>
                         </div>
                     `).join('')}
                 </div>`;
             listCont.appendChild(dayDiv);
-        }
+        });
         generateMessage(totalSemana);
     }
 
-    // Auxiliares (Mesma lógica do anterior)
+    // Auxiliares
     function toggleDay(d) { openDays[d] = !openDays[d]; render(); }
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     function showLoading(s) { document.getElementById('loading').style.display = s ? 'flex' : 'none'; }
     function getWeekRange() { const now = new Date(); const day = now.getDay(); const diff = now.getDate() - day + (day === 0 ? -6 : 1); const start = new Date(now.setDate(diff)); start.setHours(0,0,0,0); const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999); return { start, end }; }
-    function toggleTheme() { currentTheme = currentTheme === 'light' ? 'dark' : 'light'; document.body.setAttribute('data-theme', currentTheme); localStorage.setItem('theme', currentTheme); }
-    function applyTheme(t) { document.body.setAttribute('data-theme', t); }
+    function toggleTheme() { currentTheme = currentTheme === 'light' ? 'dark' : 'light'; applyTheme(currentTheme); localStorage.setItem('theme', currentTheme); }
+    function applyTheme(t) { document.body.setAttribute('data-theme', t); document.getElementById('theme-btn').innerText = t === 'light' ? '🌙' : '☀️'; }
     function switchTab(t) { currentTab = t; document.getElementById('tab-semana').classList.toggle('active', t==='semana'); document.getElementById('tab-mes').classList.toggle('active', t==='mes'); render(); }
+    function resetForm() { document.getElementById('entry-form').reset(); document.getElementById('edit-id').value = ''; document.getElementById('submit-btn').innerText = "Adicionar"; document.getElementById('cancel-edit').style.display = "none"; document.getElementById('input-date').valueAsDate = new Date(); }
     
+    async function deleteEntry(id) { if (confirm('Excluir da nuvem?')) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
+    function editEntry(id) { 
+        const e = entries.find(x => x.id == id); 
+        document.getElementById('edit-id').value = e.id;
+        document.getElementById('input-date').value = e.date;
+        document.getElementById('input-seguradora').value = e.seguradora;
+        document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+        document.getElementById('input-desc').value = e.desc;
+        document.getElementById('submit-btn').innerText = "Salvar Alteração";
+        document.getElementById('cancel-edit').style.display = "block";
+    }
+
+    // Backup & Import (Sincroniza LocalStorage com Nuvem)
+    function exportData() {
+        const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_resgate_cloud.json`; a.click();
+    }
+    function importData() {
+        const input = document.createElement('input'); input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = async re => {
+                try {
+                    const data = JSON.parse(re.target.result);
+                    showLoading(true);
+                    for (const item of data) {
+                        delete item.id; // Deixa o Supabase gerar novos IDs
+                        await _supabase.from('entries').insert([item]);
+                    }
+                    alert('Dados importados para a nuvem!'); fetchEntries();
+                } catch(err) { alert('Erro no arquivo!'); showLoading(false); }
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    }
+
+    async function clearAll() { if (confirm('Apagar TUDO da Nuvem?')) { await _supabase.from('entries').delete().neq('id', 0); fetchEntries(); } }
+
     function initCharts() {
-        pieChart = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } } });
+        pieChart = new Chart(document.getElementById('pieChart'), { type: 'doughnut', data: { labels: [], datasets: [{ data: [], backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] }, options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } } } });
         barChart = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: [], datasets: [{ label: 'R$', data: [], backgroundColor: '#e11d48' }] }, options: { maintainAspectRatio: false, scales: { y: { ticks: { color: '#94a3b8' } }, x: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } } });
     }
 
@@ -307,11 +312,9 @@
         msg += `💰 *Total previsto da semana:* ${formatCurrency(total)}`;
         document.getElementById('msg-preview').innerText = msg;
     }
-
     function copyMessage() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert('Copiado!')); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
-    // Formatação de valor
     document.getElementById('input-value').addEventListener('input', e => {
         let v = e.target.value.replace(/\D/g, '');
         v = (v / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
