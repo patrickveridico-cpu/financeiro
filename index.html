@@ -132,14 +132,23 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsbXlibHlnYnZocGx1d25jYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDY2MTQsImV4cCI6MjA5MTEyMjYxNH0.PqdwEYVYXIvOh2pYqQwaq8eyf2ZWS6BalQzOpINrXts';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // CONFIGURAÇÃO DE SEGURANÇA
+    const SENHA_MESTRE = "Murrilho123*";
+
     let entries = [];
     let currentTheme = localStorage.getItem('theme') || 'dark';
     let currentTab = 'semana';
     let openDays = {};
     let pieChart, barChart;
 
+    function validarAcesso() {
+        const senha = prompt("Digite a senha administrativa para realizar esta operação:");
+        if (senha === SENHA_MESTRE) return true;
+        alert("Senha incorreta! Operação cancelada.");
+        return false;
+    }
+
     async function init() {
-        // CORREÇÃO: Busca a logo e garante que os elementos existem antes de mexer neles
         const savedLogo = localStorage.getItem('app_logo');
         const logoImg = document.getElementById('main-logo');
         if (savedLogo && logoImg) logoImg.src = savedLogo;
@@ -150,7 +159,6 @@
         const dateInput = document.getElementById('input-date');
         if (dateInput) dateInput.valueAsDate = new Date();
 
-        // Configura o upload de logo de forma segura dentro do init
         const logoUpload = document.getElementById('logo-upload');
         if (logoUpload) {
             logoUpload.addEventListener('change', e => {
@@ -165,10 +173,9 @@
                 }
             });
         }
-
         await fetchEntries();
     }
-    // Delete as linhas 138 a 148 que ficaram repetidas abaixo do init
+
     async function fetchEntries() {
         showLoading(true);
         try {
@@ -180,6 +187,10 @@
 
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Validação de senha para salvar ou editar
+        if (!validarAcesso()) return;
+
         showLoading(true);
         const id = document.getElementById('edit-id').value;
         const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
@@ -277,7 +288,14 @@
     function switchTab(t) { currentTab = t; document.getElementById('tab-semana').classList.toggle('active', t==='semana'); document.getElementById('tab-mes').classList.toggle('active', t==='mes'); render(); }
     function resetForm() { document.getElementById('entry-form').reset(); document.getElementById('edit-id').value = ''; document.getElementById('submit-btn').innerText = "Adicionar"; document.getElementById('cancel-edit').style.display = "none"; document.getElementById('input-date').valueAsDate = new Date(); }
     
-    async function deleteEntry(id) { if (confirm('Excluir da nuvem?')) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
+    async function deleteEntry(id) { 
+        if (!validarAcesso()) return;
+        if (confirm('Excluir da nuvem?')) { 
+            await _supabase.from('entries').delete().eq('id', id); 
+            fetchEntries(); 
+        } 
+    }
+
     function editEntry(id) { 
         const e = entries.find(x => x.id == id); 
         document.getElementById('edit-id').value = e.id;
@@ -287,13 +305,17 @@
         document.getElementById('input-desc').value = e.desc;
         document.getElementById('submit-btn').innerText = "Salvar Alteração";
         document.getElementById('cancel-edit').style.display = "block";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function exportData() {
+        if (!validarAcesso()) return;
         const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_resgate_cloud.json`; a.click();
     }
+
     function importData() {
+        if (!validarAcesso()) return;
         const input = document.createElement('input'); input.type = 'file';
         input.onchange = e => {
             const reader = new FileReader();
@@ -313,7 +335,13 @@
         input.click();
     }
 
-    async function clearAll() { if (confirm('Apagar TUDO da Nuvem?')) { await _supabase.from('entries').delete().neq('id', 0); fetchEntries(); } }
+    async function clearAll() { 
+        if (!validarAcesso()) return;
+        if (confirm('Apagar TUDO da Nuvem?')) { 
+            await _supabase.from('entries').delete().neq('id', 0); 
+            fetchEntries(); 
+        } 
+    }
 
     function initCharts() {
         const ctxPie = document.getElementById('pieChart');
@@ -338,10 +366,9 @@
         e.target.value = v;
     });
 
-    // Substitua o init(); sozinho por este bloco:
-document.addEventListener('DOMContentLoaded', () => {
-    init();
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        init();
+    });
 </script>
 </body>
 </html>
