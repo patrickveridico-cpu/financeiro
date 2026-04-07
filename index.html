@@ -65,7 +65,7 @@
     <header>
         <div class="logo-container" onclick="document.getElementById('logo-upload').click()">
             <div class="logo-overlay">TROCAR LOGO</div>
-            <img id="main-logo" src="logo-resgate.png" alt="Logo" class="logo-img" onerror="this.src='https://via.placeholder.com/180x60?text=RESGATE+116'">
+            <img id="main-logo" src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/180x60?text=RESGATE+116'">
             <input type="file" id="logo-upload" hidden accept="image/*">
             <div class="brand-info">
                 <h1>Grupo Resgate 116</h1>
@@ -139,29 +139,36 @@
     let pieChart, barChart;
 
     async function init() {
-        // CORREÇÃO: Verifica se há logo salva, se não houver, mantém a logo-resgate.png do HTML
+        // CORREÇÃO: Busca a logo e garante que os elementos existem antes de mexer neles
         const savedLogo = localStorage.getItem('app_logo');
-        if (savedLogo) document.getElementById('main-logo').src = savedLogo;
+        const logoImg = document.getElementById('main-logo');
+        if (savedLogo && logoImg) logoImg.src = savedLogo;
         
         applyTheme(currentTheme);
         initCharts();
-        document.getElementById('input-date').valueAsDate = new Date();
+        
+        const dateInput = document.getElementById('input-date');
+        if (dateInput) dateInput.valueAsDate = new Date();
+
+        // Configura o upload de logo de forma segura dentro do init
+        const logoUpload = document.getElementById('logo-upload');
+        if (logoUpload) {
+            logoUpload.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = re => {
+                        if (logoImg) logoImg.src = re.target.result;
+                        localStorage.setItem('app_logo', re.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
         await fetchEntries();
     }
-
-    // Logo Upload
-    document.getElementById('logo-upload').addEventListener('change', e => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = re => {
-                document.getElementById('main-logo').src = re.target.result;
-                localStorage.setItem('app_logo', re.target.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
+    // Delete as linhas 138 a 148 que ficaram repetidas abaixo do init
     async function fetchEntries() {
         showLoading(true);
         try {
@@ -331,7 +338,10 @@
         e.target.value = v;
     });
 
+    // Substitua o init(); sozinho por este bloco:
+document.addEventListener('DOMContentLoaded', () => {
     init();
+});
 </script>
 </body>
 </html>
