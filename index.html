@@ -4,89 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Financeiro - Grupo Resgate 116</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2454/2454282.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         :root {
-            --primary: #e11d48; --primary-hover: #be123c; --success: #10b981; --danger: #ef4444;
-            --whatsapp: #25d366; --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
-            --text-muted: #94a3b8; --border: #334155; --input-bg: #0f172a;
-            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+            --primary: #e11d48; --success: #10b981; --whatsapp: #25d366; 
+            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc;
+            --text-muted: #94a3b8; --border: #334155;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
-        
-        body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; padding: 20px; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
 
         /* HEADER */
-        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding: 15px 25px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); }
         .logo-container { display: flex; align-items: center; gap: 15px; }
-        .logo-img { height: 50px; }
-        .brand-info h1 { font-size: 1.1rem; font-weight: 800; color: var(--primary); text-transform: uppercase; }
-        .brand-info p { font-size: 0.7rem; color: var(--text-muted); }
+        .logo-img { height: 60px; }
+        .brand-info h1 { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
 
-        /* STATS */
+        /* STATS DESTAQUE */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); border-left: 4px solid var(--primary); }
-        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
-        .stat-card .value { font-size: 1.4rem; font-weight: 800; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); }
+        .stat-card.highlight-hoje { border: 2px solid var(--success); background: rgba(16, 185, 129, 0.05); }
+        .stat-card.highlight-restante { border: 2px solid var(--primary); background: rgba(225, 29, 72, 0.05); }
+        
+        .stat-card h3 { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+        .stat-card .value { font-size: 1.6rem; font-weight: 900; }
 
         .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; }
 
-        /* CARDS & FORMS */
+        /* CARDS */
         .card { background: var(--card-bg); padding: 20px; border-radius: 16px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .card-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; color: var(--primary); }
+        .card-title { font-size: 0.8rem; font-weight: 700; margin-bottom: 15px; color: var(--primary); text-transform: uppercase; }
         
-        label { display: block; font-size: 0.7rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
-        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--input-bg); color: white; margin-bottom: 12px; outline: none; }
-        
-        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem; }
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: white; margin-bottom: 12px; outline: none; }
+        .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer !important; border: none; width: 100%; font-size: 0.8rem; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-whatsapp { background: var(--whatsapp); color: white; margin-top: 10px; }
 
-        /* LISTA RECOLHÍVEL (ACORDION) */
-        .day-group { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.02); }
-        
+        /* LISTA SANFONA */
+        .day-group { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
         .day-header { 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 20px; cursor: pointer; /* VOLTA DO CURSOR POINTER */
-            background: var(--card-bg);
+            padding: 15px 20px; cursor: pointer !important; background: var(--card-bg);
         }
         .day-header:hover { background: rgba(255,255,255,0.05); }
-        
-        .day-header h4 { font-size: 0.9rem; display: flex; align-items: center; gap: 10px; }
-        .day-header .day-total { color: var(--success); font-weight: 800; font-size: 1rem; }
+        .day-total { color: var(--success); font-weight: 800; font-size: 1.1rem; }
 
-        .day-content { 
-            display: none; /* Inicia recolhido */
-            padding: 10px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); 
-        }
+        .day-content { display: none; padding: 10px 20px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
         .day-group.active .day-content { display: block; }
-        .day-group.active .day-header { border-left: 4px solid var(--primary); }
 
-        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
-        .entry-row:last-child { border: none; }
-        
-        .action-btns { display: flex; gap: 10px; cursor: pointer; }
-
-        /* CHARTS */
-        .chart-container { height: 200px; position: relative; }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .action-icons span { cursor: pointer !important; margin-left: 10px; font-size: 1.1rem; }
 
         /* WHATSAPP PREVIEW */
         .msg-preview { 
             background: #0b141a; color: #e9edef; padding: 15px; border-radius: 10px; 
-            font-family: 'Courier New', monospace; font-size: 0.75rem; white-space: pre-wrap; 
+            font-family: 'Courier New', monospace; font-size: 0.85rem; white-space: pre-wrap; 
             border: 1px dashed var(--border); margin-bottom: 10px;
         }
 
         .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
-        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer; background: var(--border); border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+        .tab { flex: 1; text-align: center; padding: 10px; cursor: pointer !important; background: var(--border); border-radius: 8px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
         .tab.active { background: var(--primary); color: white; }
     </style>
 </head>
@@ -95,62 +78,56 @@
 <div class="container">
     <header>
         <div class="logo-container">
-            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
+            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x60?text=RESGATE+116'">
             <div class="brand-info">
                 <h1>GRUPO RESGATE 116</h1>
-                <p>Dashboard de Previsões Financeiras</p>
+                <p>Site por Patrick Almeida</p>
             </div>
         </div>
         <div style="display: flex; gap: 10px;">
-            <button class="btn" style="width:auto; background:var(--border); color:white" onclick="fetchEntries()">🔄 Atualizar</button>
+            <button class="btn" style="width:auto; background:var(--border); color:white" onclick="fetchEntries()">🔄 Sincronizar</button>
             <button class="btn" style="width:auto; background:var(--primary); color:white" onclick="exportData()">📥 Backup</button>
         </div>
     </header>
 
     <div class="stats-grid">
-        <div class="stat-card"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color:var(--success)">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Restante do Mês</h3><div class="value" id="stat-restante">R$ 0,00</div></div>
+        <div class="stat-card highlight-hoje"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color:var(--success)">R$ 0,00</div></div>
+        <div class="stat-card highlight-restante"><h3>Restante do Mês</h3><div class="value" id="stat-restante" style="color:var(--primary)">R$ 0,00</div></div>
         <div class="stat-card"><h3>Já Liquidados</h3><div class="value" id="stat-liquidados">R$ 0,00</div></div>
-        <div class="stat-card"><h3>Total Programado</h3><div class="value" id="stat-total">R$ 0,00</div></div>
+        <div class="stat-card"><h3>Total Mês</h3><div class="value" id="stat-total">R$ 0,00</div></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="left-column">
             <div class="card">
-                <div class="card-title">➕ Lançar Crédito</div>
+                <div class="card-title">➕ Novo Lançamento</div>
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
-                    <label>Data do Crédito</label><input type="date" id="input-date" required>
-                    <label>Seguradora</label><input type="text" id="input-seguradora" placeholder="Ex: PORTO SEGURO" required>
-                    <label>Valor Bruto (R$)</label><input type="text" id="input-value" placeholder="0,00" required>
-                    <label>Número da NF / Descrição</label><input type="text" id="input-desc" placeholder="Ex: NF 1234">
-                    <button type="submit" id="btn-submit" class="btn btn-primary">CADASTRAR NO SISTEMA</button>
+                    <input type="date" id="input-date" required>
+                    <input type="text" id="input-seguradora" placeholder="Seguradora" required>
+                    <input type="text" id="input-value" placeholder="Valor 0,00" required>
+                    <input type="text" id="input-desc" placeholder="NF / Observação">
+                    <button type="submit" id="btn-submit" class="btn btn-primary">LANÇAR CRÉDITO</button>
                 </form>
             </div>
-            <div class="card">
-                <div class="card-title">Concentração</div>
-                <div class="chart-container"><canvas id="pieChart"></canvas></div>
-            </div>
+            <div class="card"><div class="card-title">Divisão de Carteira</div><div style="height:200px"><canvas id="pieChart"></canvas></div></div>
         </div>
 
         <div class="center-column">
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS RECEBIMENTOS</div>
-                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO DE PAGOS</div>
+                <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PROGRAMADOS</div>
+                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
             <div id="list-container"></div>
         </div>
 
         <div class="right-column">
+            <div class="card"><div class="card-title">Volume Diário</div><div style="height:200px"><canvas id="barChart"></canvas></div></div>
             <div class="card">
-                <div class="card-title">Fluxo dos Últimos Dias</div>
-                <div class="chart-container"><canvas id="barChart"></canvas></div>
-            </div>
-            <div class="card">
-                <div class="card-title">Resumo para WhatsApp</div>
-                <div id="msg-preview" class="msg-preview">Gerando resumo...</div>
-                <button class="btn btn-whatsapp" onclick="sendWhatsApp()">🚀 ENVIAR PARA O GRUPO</button>
-                <button class="btn" style="background:var(--border); color:white; margin-top:8px" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
+                <div class="card-title">Resumo WhatsApp</div>
+                <div id="msg-preview" class="msg-preview">Aguardando dados...</div>
+                <button class="btn btn-whatsapp" onclick="sendWhatsApp()">🚀 ENVIAR AO GRUPO</button>
+                <button class="btn" style="background:var(--border); color:white; margin-top:8px" onclick="copyToClipboard()">📋 COPIAR</button>
             </div>
         </div>
     </div>
@@ -202,20 +179,18 @@
         
         Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
-            const dataFmt = date.split('-').reverse().slice(0,2).join('/');
-            
             const div = document.createElement('div');
             div.className = `day-group ${openDays[date] ? 'active' : ''}`;
             div.innerHTML = `
                 <div class="day-header" onclick="toggleDay('${date}')">
-                    <h4>📅 ${dataFmt}</h4>
+                    <span>📅 <b>${date.split('-').reverse().slice(0,2).join('/')}</b></span>
                     <span class="day-total">${formatCurrency(totalDia)}</span>
                 </div>
                 <div class="day-content">
                     ${groups[date].map(e => `
                         <div class="entry-row">
                             <span><b>${e.seguradora}</b> <small style="color:var(--text-muted)">${e.desc || ''}</small></span>
-                            <div class="action-btns">
+                            <div class="action-icons">
                                 <b>${formatCurrency(e.value)}</b>
                                 <span onclick="editEntry(${e.id})">✏️</span>
                                 <span onclick="deleteEntry(${e.id})">🗑️</span>
@@ -230,18 +205,12 @@
         updateWhatsapp(hoje);
     }
 
-    function toggleDay(date) {
-        openDays[date] = !openDays[date];
-        render();
-    }
+    function toggleDay(date) { openDays[date] = !openDays[date]; render(); }
 
-    // MODELO DE WHATSAPP CONFORME SOLICITADO
     function updateWhatsapp(hoje) {
         let msg = "*Previsões de crédito para a semana:*\n\n";
-        
         const proximos = entries.filter(e => e.date >= hoje).sort((a,b) => a.date.localeCompare(b.date));
         const groups = proximos.reduce((acc, e) => { acc[e.date] = acc[e.date] || []; acc[e.date].push(e); return acc; }, {});
-
         const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
 
         Object.keys(groups).slice(0,7).forEach(date => {
@@ -249,10 +218,8 @@
             const dataFmt = date.split('-').reverse().slice(0,2).join('/');
             const diaNome = diasSemana[dataObj.getDay()];
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
-            
             msg += `${dataFmt} ${diaNome}: *${formatCurrency(totalDia)}*\n\n`;
         });
-        
         document.getElementById('msg-preview').innerText = msg;
     }
 
@@ -269,7 +236,6 @@
         };
         if (id) await _supabase.from('entries').update(data).eq('id', id);
         else await _supabase.from('entries').insert([data]);
-        
         document.getElementById('entry-form').reset();
         document.getElementById('edit-id').value = '';
         fetchEntries();
@@ -286,10 +252,7 @@
     }
 
     async function deleteEntry(id) {
-        if(confirm('Excluir lançamento?')) {
-            await _supabase.from('entries').delete().eq('id', id);
-            fetchEntries();
-        }
+        if(confirm('Excluir?')) { await _supabase.from('entries').delete().eq(id, id); fetchEntries(); }
     }
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
@@ -301,7 +264,6 @@
             data: { labels: Object.keys(segData), datasets: [{ data: Object.values(segData), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] },
             options: { maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
-
         if (barChart) barChart.destroy();
         const lastDays = Object.keys(dailyData).sort().slice(-7);
         barChart = new Chart(document.getElementById('barChart'), {
