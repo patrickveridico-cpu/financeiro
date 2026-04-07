@@ -10,101 +10,58 @@
     
     <style>
         :root {
-            --primary: #e11d48; --success: #10b981; --bg: #0f172a; --card-bg: rgba(30, 41, 59, 0.7); 
-            --text-main: #f8fafc; --text-muted: #94a3b8; --border: rgba(255, 255, 255, 0.1);
-            --accent: #3b82f6;
+            --primary: #e11d48; --success: #10b981; --bg: #0b0e14; --card-bg: rgba(22, 27, 34, 0.8); 
+            --text-main: #f0f6fc; --text-muted: #8b949e; --border: rgba(48, 54, 61, 0.8);
         }
         [data-theme="light"] {
-            --bg: #f8fafc; --card-bg: rgba(255, 255, 255, 0.8); --text-main: #0f172a; 
-            --text-muted: #64748b; --border: rgba(0, 0, 0, 0.1);
+            --bg: #f1f5f9; --card-bg: rgba(255, 255, 255, 0.9); --text-main: #0f172a; 
+            --text-muted: #64748b; --border: #e2e8f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        
-        body { 
-            background: var(--bg); 
-            color: var(--text-main); 
-            padding: 20px; 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background-image: radial-gradient(circle at 50% -20%, rgba(225, 29, 72, 0.15), transparent 40%);
-            min-height: 100vh;
-        }
-
+        body { background: var(--bg); color: var(--text-main); padding: 20px; transition: 0.3s; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; }
 
-        /* Estilo Tecnológico dos Cards */
         .glass-card {
             background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            transition: all 0.3s ease;
+            border-radius: 12px;
+            transition: transform 0.2s;
         }
 
-        .glass-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-            box-shadow: 0 10px 30px -10px rgba(225, 29, 72, 0.3);
-        }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 25px; margin-bottom: 25px; }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-img { height: 45px; }
 
-        header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px 30px; margin-bottom: 30px;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { padding: 20px; border-left: 4px solid var(--primary); }
+        .stat-card.previsao { border-left-color: var(--success); }
+        .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 1px; }
+        .stat-card .value { font-size: 1.4rem; font-weight: 800; }
 
-        .logo-area { display: flex; align-items: center; gap: 20px; }
-        .logo-img { height: 55px; filter: drop-shadow(0 0 8px rgba(225, 29, 72, 0.3)); transition: 0.5s; }
-        .logo-img:hover { transform: scale(1.05) rotate(-2deg); }
-
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { padding: 25px; position: relative; overflow: hidden; }
-        .stat-card::after { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--primary); }
-        .stat-card.previsao::after { background: var(--success); }
+        .dashboard-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 20px; }
+        .card { padding: 20px; margin-bottom: 20px; }
         
-        .stat-card h3 { font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-        .stat-card .value { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+        .admin-only { display: none; }
+        body.is-admin .admin-only { display: block; }
 
-        .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 25px; }
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 10px; }
+        .tab { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+        .tab.active { background: var(--primary); color: white; }
 
-        /* Lista de Créditos Estilizada */
-        .day-group { margin-bottom: 12px; transition: 0.3s; }
-        .day-header { 
-            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; border-radius: 12px; background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-        }
-        .day-header:active { transform: scale(0.98); }
-        .day-header:hover { background: rgba(225, 29, 72, 0.05); border-color: var(--primary); }
-
-        .btn { 
-            padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; 
-            transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4); }
-        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.1); }
+        /* Lista Interativa */
+        .day-group { margin-bottom: 8px; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: var(--card-bg); }
+        .day-header { display: flex; justify-content: space-between; padding: 12px 15px; cursor: pointer; transition: 0.2s; }
+        .day-header:hover { background: rgba(225, 29, 72, 0.1); }
+        .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); background: rgba(0,0,0,0.1); }
+        .day-group.active .day-content { display: block; }
         
-        input { 
-            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; 
-            background: rgba(0,0,0,0.2); color: white; margin-bottom: 15px; outline: none;
-        }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(225, 29, 72, 0.2); }
+        input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.2); color: white; margin-bottom: 10px; }
+        .btn { padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; }
+        .btn-primary { background: var(--primary); color: white; }
 
-        .tab { 
-            flex: 1; padding: 10px; text-align: center; cursor: pointer; font-size: 0.8rem; font-weight: 800;
-            border-radius: 8px; transition: 0.3s; color: var(--text-muted);
-        }
-        .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
-
-        #msg-preview { 
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--success);
-            padding: 20px; background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid var(--border);
-        }
-
-        /* Animação de entrada */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .stat-card, .day-group, .card { animation: fadeIn 0.5s ease forwards; }
-
+        #msg-preview { font-family: monospace; font-size: 0.75rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.3); border-radius: 10px; white-space: pre-wrap; }
     </style>
 </head>
 <body data-theme="dark">
@@ -114,43 +71,42 @@
         <div class="logo-area">
             <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/150x50?text=RESGATE+116'">
             <div class="brand-info">
-                <h1 style="letter-spacing: -1px;">GRUPO <span style="color:var(--text-main)">RESGATE 116</span></h1>
-                <p style="text-transform: uppercase; font-weight: 700; font-size: 0.6rem; letter-spacing: 2px;">Finance System v2.0</p>
-                <div style="font-size: 0.6rem; color: var(--text-muted); margin-top: 4px;">Dev by Patrick Almeida</div>
+                <h1 style="font-size: 1.1rem; color: var(--primary);">GRUPO RESGATE 116</h1>
+                <div style="font-size: 0.65rem; color: var(--text-muted); font-weight: 600;">Site criado por Patrick Almeida</div>
             </div>
         </div>
-        <div style="display: flex; gap: 12px;">
-            <button class="btn glass-card" onclick="toggleTheme()" style="width: 45px; padding: 0;">🌓</button>
-            <button class="btn glass-card" onclick="fetchEntries()" style="width: 45px; padding: 0;">🔄</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn glass-card" onclick="toggleTheme()" style="width: 40px; padding:0">🌓</button>
+            <button class="btn glass-card" onclick="fetchEntries()" style="width: 40px; padding:0">🔄</button>
         </div>
     </header>
 
     <div class="stats-grid">
         <div class="stat-card glass-card previsao"><h3>Previsto Hoje</h3><div class="value" id="stat-hoje" style="color: var(--success)">R$ 0,00</div></div>
         <div class="stat-card glass-card previsao"><h3>Restante do Mês</h3><div class="value" id="stat-restante-mes">R$ 0,00</div></div>
-        <div class="stat-card glass-card"><h3>Acumulado Mês</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
-        <div class="stat-card glass-card" style="opacity: 0.7;"><h3>Volume Geral</h3><div class="value" id="stat-bruto">R$ 0,00</div></div>
+        <div class="stat-card glass-card"><h3>Já Liquidados (Mês)</h3><div class="value" id="stat-liquidados" style="color: var(--text-muted)">R$ 0,00</div></div>
+        <div class="stat-card glass-card"><h3>Total Programado (Mês)</h3><div class="value" id="stat-total-mes">R$ 0,00</div></div>
     </div>
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="card glass-card admin-only" style="padding: 25px;">
-                <h4 style="margin-bottom:20px; font-size:0.75rem; letter-spacing: 1px;">NOVO AGENDAMENTO</h4>
+            <div class="card glass-card admin-only">
+                <h4 style="margin-bottom:15px; font-size:0.7rem; letter-spacing:1px">NOVO LANÇAMENTO</h4>
                 <form id="entry-form">
                     <input type="date" id="input-date" required>
                     <input type="text" id="input-seguradora" placeholder="SEGURADORA" required>
                     <input type="text" id="input-value" placeholder="VALOR R$ 0,00" required>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">REGISTRAR CRÉDITO</button>
+                    <button type="submit" class="btn btn-primary">AGENDAR</button>
                 </form>
             </div>
-            <div class="card glass-card" style="padding: 20px;">
-                <h4 style="margin-bottom:15px; font-size:0.75rem;">CONCENTRAÇÃO</h4>
-                <canvas id="pieChart" height="220"></canvas>
+            <div class="card glass-card">
+                <h4 style="margin-bottom:15px; font-size:0.7rem">CONCENTRAÇÃO</h4>
+                <div style="height: 200px;"><canvas id="pieChart"></canvas></div>
             </div>
         </div>
 
         <div class="center-column">
-            <div class="glass-card" style="display: flex; gap: 5px; padding: 6px; margin-bottom: 20px;">
+            <div class="tabs glass-card">
                 <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS CRÉDITOS</div>
                 <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
@@ -159,11 +115,9 @@
 
         <div class="right-column">
             <div class="card glass-card">
-                <h4 style="margin-bottom:15px; font-size:0.75rem;">AUTOMAÇÃO WHATSAPP</h4>
-                <div id="msg-preview">Carregando dados...</div>
-                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; width: 100%; margin-top: 15px;">
-                    ENVIAR PARA O GRUPO
-                </button>
+                <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
+                <div id="msg-preview"></div>
+                <button class="btn" onclick="sendWhatsApp()" style="background: #238636; color: white; margin-top: 15px;">ENVIAR GRUPO</button>
             </div>
         </div>
     </div>
@@ -176,6 +130,7 @@
 
     let entries = [];
     let currentTab = 'proximos';
+    let pieChart;
 
     async function fetchEntries() {
         const { data } = await _supabase.from('entries').select('*').order('date', { ascending: true });
@@ -189,15 +144,21 @@
         const mesAtual = agora.getMonth();
         const anoAtual = agora.getFullYear();
 
-        let somaHoje = 0, somaRestanteMes = 0, somaTotalMes = 0, somaBruto = 0;
+        let somaHoje = 0, somaRestanteMes = 0, somaLiquidados = 0, somaTotalMes = 0;
+        let segTotals = {};
         let semanaValores = {};
 
         entries.forEach(e => {
             const d = new Date(e.date + 'T12:00:00');
-            somaBruto += e.value;
+            
             if (d.getMonth() === mesAtual && d.getFullYear() === anoAtual) {
                 somaTotalMes += e.value;
-                if (e.date >= hoje) somaRestanteMes += e.value;
+                if (e.date >= hoje) {
+                    somaRestanteMes += e.value;
+                    segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
+                } else {
+                    somaLiquidados += e.value;
+                }
             }
             if (e.date === hoje) somaHoje += e.value;
             semanaValores[e.date] = (semanaValores[e.date] || 0) + e.value;
@@ -205,8 +166,8 @@
 
         document.getElementById('stat-hoje').innerText = formatCurrency(somaHoje);
         document.getElementById('stat-restante-mes').innerText = formatCurrency(somaRestanteMes);
+        document.getElementById('stat-liquidados').innerText = formatCurrency(somaLiquidados);
         document.getElementById('stat-total-mes').innerText = formatCurrency(somaTotalMes);
-        document.getElementById('stat-bruto').innerText = formatCurrency(somaBruto);
 
         const filtered = entries.filter(e => currentTab === 'proximos' ? e.date >= hoje : e.date < hoje);
         const groups = filtered.reduce((acc, e) => { acc[e.date] = acc[e.date] || []; acc[e.date].push(e); return acc; }, {});
@@ -215,26 +176,39 @@
         listCont.innerHTML = '';
         Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
-            const isToday = date === hoje;
             const div = document.createElement('div');
             div.className = 'day-group';
             div.innerHTML = `
-                <div class="day-header" onclick="this.parentElement.classList.toggle('active')" style="${isToday ? 'border-left: 3px solid var(--success)' : ''}">
-                    <span style="font-size:0.85rem"><b>${date.split('-').reverse().slice(0,2).join('/')}</b> ${isToday ? '• <small>HOJE</small>' : ''}</span>
+                <div class="day-header" onclick="this.parentElement.classList.toggle('active')">
+                    <span><b>${date.split('-').reverse().slice(0,2).join('/')}</b></span>
                     <span style="color:var(--success); font-weight:800">${formatCurrency(totalDia)}</span>
                 </div>
-                <div class="day-content" style="display:none; padding:15px; background:rgba(0,0,0,0.1); border-radius:0 0 12px 12px;">
-                    ${groups[date].map(e => `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:6px 0;border-bottom:1px solid var(--border)"><span>${e.seguradora}</span><b>${formatCurrency(e.value)}</b></div>`).join('')}
+                <div class="day-content">
+                    ${groups[date].map(e => `<div style="display:flex;justify-content:space-between;font-size:0.75rem;padding:8px 0;border-bottom:1px solid var(--border)"><span>${e.seguradora}</span><b>${formatCurrency(e.value)}</b></div>`).join('')}
                 </div>`;
             listCont.appendChild(div);
         });
 
+        updateChart(segTotals);
         updateWhatsapp(semanaValores);
+    }
+
+    function updateChart(data) {
+        const ctx = document.getElementById('pieChart').getContext('2d');
+        if (pieChart) pieChart.destroy();
+        pieChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{ data: Object.values(data), backgroundColor: ['#e11d48', '#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }]
+            },
+            options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+        });
     }
 
     function updateWhatsapp(valores) {
         let msg = "📊 *PROGRAMAÇÕES DA SEMANA*\n\n";
-        const diasSemana = ["Dom", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sáb"];
+        const diasSemana = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
         Object.keys(valores).sort().filter(d => d >= new Date().toISOString().split('T')[0]).slice(0,5).forEach(date => {
             const d = new Date(date + 'T12:00:00');
             msg += `📅 ${date.split('-').reverse().slice(0,2).join('/')} ${diasSemana[d.getDay()]} - *${formatCurrency(valores[date])}*\n`;
@@ -243,24 +217,12 @@
     }
 
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-    
-    function toggleTheme() { 
-        const b = document.body; 
-        const isDark = b.getAttribute('data-theme') === 'dark';
-        b.setAttribute('data-theme', isDark ? 'light' : 'dark'); 
-    }
-
-    function switchTab(t) { 
-        currentTab = t; 
-        document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); 
-        document.getElementById('tab-historico').classList.toggle('active', t==='historico'); 
-        render(); 
-    }
-
+    function toggleTheme() { document.body.setAttribute('data-theme', document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'); }
+    function switchTab(t) { currentTab = t; document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); document.getElementById('tab-historico').classList.toggle('active', t==='historico'); render(); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
     if (new URLSearchParams(window.location.search).get('admin') === 'true') {
-        if (prompt("Senha Admin:") === "Murrilho123*") { document.body.classList.add('is-admin'); }
+        if (prompt("Senha Admin:") === "Murrilho123*") document.body.classList.add('is-admin');
     }
 
     document.getElementById('input-value').addEventListener('input', e => {
@@ -271,11 +233,7 @@
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const val = parseFloat(document.getElementById('input-value').value.replace(/\D/g, '')) / 100;
-        await _supabase.from('entries').insert([{
-            date: document.getElementById('input-date').value,
-            seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
-            value: val
-        }]);
+        await _supabase.from('entries').insert([{ date: document.getElementById('input-date').value, seguradora: document.getElementById('input-seguradora').value.toUpperCase(), value: val }]);
         fetchEntries();
     });
 
