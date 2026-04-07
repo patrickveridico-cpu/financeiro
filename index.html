@@ -24,54 +24,43 @@
             background-image: radial-gradient(circle at 50% 50%, rgba(225, 29, 72, 0.05) 0%, transparent 100%);
         }
 
-        /* FUNDO COM GRID */
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 50px 50px; opacity: 0.03; z-index: -1; pointer-events: none;
-        }
-
         .container { max-width: 1500px; margin: 0 auto; }
         .glass-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; }
 
-        /* HEADER E LOGO MAIOR */
         header { display: flex; justify-content: space-between; align-items: center; padding: 20px 30px; }
         .logo-container { display: flex; align-items: center; gap: 20px; }
-        .logo-img { height: 70px; cursor: pointer; transition: transform 0.3s; }
-        .logo-img:hover { transform: scale(1.05); }
-        .brand-info h1 { font-size: 1.4rem; color: var(--primary); font-weight: 800; letter-spacing: -1px; }
+        .logo-img { height: 75px; }
+        .brand-info h1 { font-size: 1.4rem; color: var(--primary); font-weight: 800; }
         .brand-info p { font-size: 0.75rem; color: var(--text-muted); }
 
-        /* GRIDS */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 25px; }
         .stat-card { padding: 25px; border-left: 5px solid var(--primary); }
         .stat-card .value { font-size: 1.8rem; font-weight: 900; margin-top: 5px; }
 
         .dashboard-grid { display: grid; grid-template-columns: 380px 1fr 380px; gap: 20px; }
 
-        /* FORMULÁRIO DE CADASTRO */
-        .admin-section { padding: 20px; }
         label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 5px; }
         input { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(0,0,0,0.5); color: white; margin-bottom: 15px; font-size: 0.9rem; color-scheme: dark; }
         
         .btn { padding: 12px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; width: 100%; transition: 0.2s; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: #be123c; }
-        .btn-outline { background: none; border: 1px solid var(--border); color: white; margin-top: 5px; }
+        .btn-outline { background: none; border: 1px solid var(--border); color: white; }
 
-        /* LISTAGEM */
-        .day-group { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: rgba(255,255,255,0.02); }
-        .day-header { display: flex; justify-content: space-between; padding: 15px; cursor: pointer; background: rgba(255,255,255,0.03); }
-        .day-content { padding: 10px 15px; }
-        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        
-        .action-btns { display: flex; gap: 15px; align-items: center; }
-        .btn-action { background: none; border: none; cursor: pointer; font-size: 1.1rem; filter: grayscale(1); transition: 0.2s; }
-        .btn-action:hover { filter: grayscale(0); transform: scale(1.2); }
+        /* AJUSTE SANFONA (COLLAPSE) */
+        .day-group { margin-bottom: 10px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+        .day-header { display: flex; justify-content: space-between; padding: 15px; cursor: pointer; background: rgba(255,255,255,0.03); transition: background 0.3s; }
+        .day-header:hover { background: rgba(255,255,255,0.08); }
+        .day-content { display: none; padding: 10px 15px; border-top: 1px solid var(--border); }
+        .day-group.active .day-content { display: block; }
+        .day-header::after { content: '▼'; font-size: 0.7rem; color: var(--text-muted); transition: 0.3s; }
+        .day-group.active .day-header::after { transform: rotate(180deg); }
 
-        /* CHARTS E WHATSAPP */
-        .chart-box { padding: 20px; }
-        .chart-container { height: 250px; position: relative; }
+        .entry-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem; }
+        .action-btns { display: flex; gap: 12px; align-items: center; }
+        .btn-action { background: none; border: none; cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .btn-action:hover { opacity: 1; transform: scale(1.1); }
+
+        .chart-container { height: 250px; }
         .msg-preview { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--success); padding: 15px; background: rgba(0,0,0,0.4); border-radius: 8px; white-space: pre-wrap; border: 1px dashed var(--border); }
 
         .tabs { display: flex; gap: 10px; padding: 10px; }
@@ -84,7 +73,7 @@
 <div class="container">
     <header class="glass-card">
         <div class="logo-container">
-            <img src="logo-resgate.png" class="logo-img" alt="Resgate 116" onerror="this.src='https://via.placeholder.com/200x80?text=RESGATE+116'">
+            <img src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/200x80?text=RESGATE+116'">
             <div class="brand-info">
                 <h1>GRUPO RESGATE 116</h1>
                 <p>Site criado por Patrick Almeida</p>
@@ -106,29 +95,20 @@
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="glass-card admin-section">
+            <div class="glass-card" style="padding:20px">
                 <h4 style="margin-bottom:20px; color:var(--primary)">➕ LANÇAR CRÉDITO</h4>
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
-                    <label>Data do Crédito</label>
-                    <input type="date" id="input-date" required>
-                    
-                    <label>Seguradora</label>
-                    <input type="text" id="input-seguradora" placeholder="Ex: PORTO SEGURO" required>
-                    
-                    <label>Valor Bruto (R$)</label>
-                    <input type="text" id="input-value" placeholder="0,00" required>
-                    
-                    <label>Número da NF / Descrição</label>
-                    <input type="text" id="input-desc" placeholder="Ex: NF 1234">
-                    
+                    <label>Data</label><input type="date" id="input-date" required>
+                    <label>Seguradora</label><input type="text" id="input-seguradora" placeholder="Ex: PORTO SEGURO" required>
+                    <label>Valor (R$)</label><input type="text" id="input-value" placeholder="0,00" required>
+                    <label>Nota Fiscal / Obs</label><input type="text" id="input-desc" placeholder="NF-000">
                     <button type="submit" id="btn-submit" class="btn btn-primary">CADASTRAR NO SISTEMA</button>
-                    <button type="button" id="btn-cancel" class="btn btn-outline" style="display:none" onclick="resetForm()">CANCELAR EDIÇÃO</button>
+                    <button type="button" id="btn-cancel" class="btn btn-outline" style="display:none; margin-top:10px" onclick="resetForm()">CANCELAR</button>
                 </form>
             </div>
-            
-            <div class="glass-card chart-box">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">CONCENTRAÇÃO POR CLIENTE</h4>
+            <div class="glass-card" style="padding:20px">
+                <h4 style="margin-bottom:15px; font-size:0.7rem">CONCENTRAÇÃO</h4>
                 <div class="chart-container"><canvas id="pieChart"></canvas></div>
             </div>
         </div>
@@ -136,22 +116,21 @@
         <div class="center-column">
             <div class="glass-card tabs">
                 <div class="tab active" onclick="switchTab('proximos')" id="tab-proximos">PRÓXIMOS RECEBIMENTOS</div>
-                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO DE PAGOS</div>
+                <div class="tab" onclick="switchTab('historico')" id="tab-historico">HISTÓRICO</div>
             </div>
             <div id="list-container"></div>
         </div>
 
         <div class="right-column">
-            <div class="glass-card chart-box">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">FLUXO DOS ÚLTIMOS DIAS</h4>
+            <div class="glass-card" style="padding:20px">
+                <h4 style="margin-bottom:15px; font-size:0.7rem">FLUXO DIÁRIO</h4>
                 <div class="chart-container"><canvas id="barChart"></canvas></div>
             </div>
-
-            <div class="glass-card chart-box">
-                <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO PARA WHATSAPP</h4>
-                <div id="msg-preview" class="msg-preview">Carregando resumo...</div>
+            <div class="glass-card" style="padding:20px">
+                <h4 style="margin-bottom:15px; font-size:0.7rem">RESUMO WHATSAPP</h4>
+                <div id="msg-preview" class="msg-preview">Carregando...</div>
                 <button class="btn btn-outline" style="margin-top:10px" onclick="copyToClipboard()">📋 COPIAR TEXTO</button>
-                <button class="btn" style="background:#238636; color:white; margin-top:10px" onclick="sendWhatsApp()">🚀 ENVIAR AO GRUPO</button>
+                <button class="btn" style="background:#238636; color:white; margin-top:10px" onclick="sendWhatsApp()">🚀 ENVIAR GRUPO</button>
             </div>
         </div>
     </div>
@@ -165,6 +144,7 @@
     let entries = [];
     let currentTab = 'proximos';
     let pieChart, barChart;
+    let openDays = {}; // Controla quais dias estão abertos
 
     async function fetchEntries() {
         const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
@@ -203,16 +183,17 @@
         Object.keys(groups).sort((a,b) => currentTab === 'proximos' ? a.localeCompare(b) : b.localeCompare(a)).forEach(date => {
             const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
             const div = document.createElement('div');
-            div.className = 'day-group';
+            // Mantém o estado de aberto/fechado ao renderizar
+            div.className = `day-group ${openDays[date] ? 'active' : ''}`;
             div.innerHTML = `
-                <div class="day-header" onclick="this.parentElement.classList.toggle('active')">
+                <div class="day-header" onclick="toggleDay('${date}')">
                     <span>📅 <b>${date.split('-').reverse().slice(0,2).join('/')}</b></span>
-                    <span style="color:var(--success); font-weight:800">${formatCurrency(totalDia)}</span>
+                    <span style="color:var(--success); font-weight:800; margin-right:15px">${formatCurrency(totalDia)}</span>
                 </div>
                 <div class="day-content">
                     ${groups[date].map(e => `
                         <div class="entry-row">
-                            <span><b>${e.seguradora}</b> <small style="color:var(--text-muted); margin-left:10px">${e.desc || '(Sem NF)'}</small></span>
+                            <span><b>${e.seguradora}</b> <small style="color:var(--text-muted); margin-left:8px">${e.desc || ''}</small></span>
                             <div class="action-btns">
                                 <b>${formatCurrency(e.value)}</b>
                                 <button class="btn-action" onclick="editEntry(${e.id})">✏️</button>
@@ -228,7 +209,35 @@
         updateWhatsapp();
     }
 
-    // FORMULÁRIO E AÇÕES
+    function toggleDay(date) {
+        openDays[date] = !openDays[date];
+        render(); // Re-renderiza para aplicar a classe 'active'
+    }
+
+    // MODELO DE RESUMO WHATSAPP ATUALIZADO
+    function updateWhatsapp() {
+        const hoje = new Date().toISOString().split('T')[0];
+        let msg = "📊 *PREVISÃO CRÉDITOS - RESGATE 116*\n\n";
+        
+        const proximos = entries.filter(e => e.date >= hoje).sort((a,b) => a.date.localeCompare(b.date));
+        const groups = proximos.reduce((acc, e) => { acc[e.date] = acc[e.date] || []; acc[e.date].push(e); return acc; }, {});
+
+        Object.keys(groups).slice(0,10).forEach(date => {
+            const dataFmt = date.split('-').reverse().slice(0,2).join('/');
+            const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
+            msg += `🗓️ *${dataFmt}* ➔ _${formatCurrency(totalDia)}_\n`;
+            
+            groups[date].forEach(e => {
+                msg += `   • ${e.seguradora}: *${formatCurrency(e.value)}*\n`;
+            });
+            msg += `\n`;
+        });
+        
+        msg += `_Confira os detalhes no painel cloud._`;
+        document.getElementById('msg-preview').innerText = msg;
+    }
+
+    // CRUD E OUTROS
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('edit-id').value;
@@ -239,12 +248,9 @@
             value: val,
             desc: document.getElementById('input-desc').value.toUpperCase()
         };
-
         if (id) await _supabase.from('entries').update(data).eq('id', id);
         else await _supabase.from('entries').insert([data]);
-        
-        resetForm();
-        fetchEntries();
+        resetForm(); fetchEntries();
     });
 
     function editEntry(id) {
@@ -254,13 +260,13 @@
         document.getElementById('input-seguradora').value = e.seguradora;
         document.getElementById('input-value').value = e.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
         document.getElementById('input-desc').value = e.desc || '';
-        document.getElementById('btn-submit').innerText = "ATUALIZAR LANÇAMENTO";
+        document.getElementById('btn-submit').innerText = "SALVAR ALTERAÇÕES";
         document.getElementById('btn-cancel').style.display = "block";
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     async function deleteEntry(id) {
-        if(confirm('Deseja realmente excluir este lançamento?')) {
+        if(confirm('Excluir lançamento?')) {
             await _supabase.from('entries').delete().eq('id', id);
             fetchEntries();
         }
@@ -274,16 +280,8 @@
         document.getElementById('input-date').valueAsDate = new Date();
     }
 
-    // UTILITÁRIOS
     function formatCurrency(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
     
-    function switchTab(t) { 
-        currentTab = t; 
-        document.getElementById('tab-proximos').classList.toggle('active', t==='proximos'); 
-        document.getElementById('tab-historico').classList.toggle('active', t==='historico'); 
-        render(); 
-    }
-
     function updateCharts(segData, dailyData) {
         if (pieChart) pieChart.destroy();
         pieChart = new Chart(document.getElementById('pieChart'), {
@@ -301,20 +299,14 @@
         });
     }
 
-    function updateWhatsapp() {
-        let msg = "📊 *PREVISÃO RESGATE 116*\n\n";
-        entries.filter(e => e.date >= new Date().toISOString().split('T')[0]).slice(0,8).forEach(e => {
-            msg += `📅 ${e.date.split('-').reverse().slice(0,2).join('/')} - ${e.seguradora}: *${formatCurrency(e.value)}*\n`;
-        });
-        document.getElementById('msg-preview').innerText = msg;
-    }
-
-    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert("Resumo copiado!")); }
+    function switchTab(t) { currentTab = t; render(); }
+    function copyToClipboard() { navigator.clipboard.writeText(document.getElementById('msg-preview').innerText).then(() => alert("Copiado!")); }
     function sendWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(document.getElementById('msg-preview').innerText)}`, '_blank'); }
 
     function exportData() {
-        const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'backup_resgate116.json'; a.click();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify(entries)], { type: 'application/json' }));
+        a.download = 'backup_resgate.json'; a.click();
     }
 
     function importData() {
