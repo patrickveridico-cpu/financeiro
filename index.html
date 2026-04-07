@@ -35,6 +35,13 @@
         .stat-card h3 { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
         .stat-card .value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
         .dashboard-grid { display: grid; grid-template-columns: 350px 1fr 350px; gap: 20px; }
+        
+        /* ADAPTAÇÃO PARA VISITANTE */
+        .admin-only { display: none; }
+        body.is-admin .admin-only { display: block; }
+        body.is-admin .admin-inline { display: inline-block; }
+        .admin-inline { display: none; }
+
         .card { background: var(--card-bg); padding: 20px; border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; }
         .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
         .form-group { margin-bottom: 12px; }
@@ -63,8 +70,8 @@
 
 <div class="container">
     <header>
-        <div class="logo-container" onclick="document.getElementById('logo-upload').click()">
-            <div class="logo-overlay">TROCAR LOGO</div>
+        <div class="logo-container" onclick="if(isAdmin) document.getElementById('logo-upload').click()">
+            <div class="logo-overlay admin-only">TROCAR LOGO</div>
             <img id="main-logo" src="logo-resgate.png" class="logo-img" alt="Logo" onerror="this.src='https://via.placeholder.com/180x60?text=RESGATE+116'">
             <input type="file" id="logo-upload" hidden accept="image/*">
             <div class="brand-info">
@@ -75,8 +82,8 @@
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-outline btn-icon" onclick="toggleTheme()" id="theme-btn">☀️</button>
             <button class="btn btn-outline btn-icon" onclick="fetchEntries()" title="Atualizar">🔄</button>
-            <button class="btn btn-outline btn-icon" onclick="exportData()" title="Backup">📥</button>
-            <button class="btn btn-outline btn-icon" onclick="importData()" title="Importar">📤</button>
+            <button class="btn btn-outline btn-icon admin-only" onclick="exportData()" title="Backup">📥</button>
+            <button class="btn btn-outline btn-icon admin-only" onclick="importData()" title="Importar">📤</button>
         </div>
     </header>
 
@@ -89,7 +96,7 @@
 
     <div class="dashboard-grid">
         <div class="left-column">
-            <div class="card">
+            <div class="card admin-only">
                 <div class="card-title">➕ Novo Lançamento</div>
                 <form id="entry-form">
                     <input type="hidden" id="edit-id">
@@ -122,7 +129,7 @@
                     <button class="btn btn-whatsapp" onclick="sendWhatsApp()">WhatsApp</button>
                 </div>
             </div>
-            <button class="btn btn-outline" onclick="clearAll()" style="color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">🗑️ Limpar Nuvem</button>
+            <button class="btn btn-outline admin-only" onclick="clearAll()" style="color: var(--danger); border-color: var(--danger); font-size: 0.75rem;">🗑️ Limpar Nuvem</button>
         </div>
     </div>
 </div>
@@ -132,8 +139,8 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsbXlibHlnYnZocGx1d25jYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDY2MTQsImV4cCI6MjA5MTEyMjYxNH0.PqdwEYVYXIvOh2pYqQwaq8eyf2ZWS6BalQzOpINrXts';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // CONFIGURAÇÃO DE SEGURANÇA
     const SENHA_MESTRE = "Murrilho123*";
+    let isAdmin = false;
 
     let entries = [];
     let currentTheme = localStorage.getItem('theme') || 'dark';
@@ -141,14 +148,21 @@
     let openDays = {};
     let pieChart, barChart;
 
-    function validarAcesso() {
-        const senha = prompt("Digite a senha administrativa para realizar esta operação:");
-        if (senha === SENHA_MESTRE) return true;
-        alert("Senha incorreta! Operação cancelada.");
-        return false;
-    }
-
     async function init() {
+        // CHECA SE É ADMIN PELA URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('admin') === 'true') {
+            const senha = prompt("Modo Administrativo detectado. Digite a senha:");
+            if (senha === SENHA_MESTRE) {
+                isAdmin = true;
+                document.body.classList.add('is-admin');
+            } else {
+                alert("Senha incorreta. Acesso como visitante.");
+                // Remove o param da URL para não ficar pedindo senha no refresh
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
         const savedLogo = localStorage.getItem('app_logo');
         const logoImg = document.getElementById('main-logo');
         if (savedLogo && logoImg) logoImg.src = savedLogo;
@@ -187,9 +201,7 @@
 
     document.getElementById('entry-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // Validação de senha para salvar ou editar
-        if (!validarAcesso()) return;
+        if(!isAdmin) return;
 
         showLoading(true);
         const id = document.getElementById('edit-id').value;
@@ -268,8 +280,8 @@
                             <span><b>${e.seguradora}</b>: ${e.desc || '-'}</span>
                             <div>
                                 <span>${formatCurrency(e.value)}</span>
-                                <button onclick="editEntry(${e.id})" style="border:none;background:none;cursor:pointer;margin-left:10px">✏️</button>
-                                <button onclick="deleteEntry(${e.id})" style="border:none;background:none;cursor:pointer">🗑️</button>
+                                <button onclick="editEntry(${e.id})" class="admin-inline" style="border:none;background:none;cursor:pointer;margin-left:10px">✏️</button>
+                                <button onclick="deleteEntry(${e.id})" class="admin-inline" style="border:none;background:none;cursor:pointer">🗑️</button>
                             </div>
                         </div>
                     `).join('')}
@@ -289,7 +301,7 @@
     function resetForm() { document.getElementById('entry-form').reset(); document.getElementById('edit-id').value = ''; document.getElementById('submit-btn').innerText = "Adicionar"; document.getElementById('cancel-edit').style.display = "none"; document.getElementById('input-date').valueAsDate = new Date(); }
     
     async function deleteEntry(id) { 
-        if (!validarAcesso()) return;
+        if(!isAdmin) return;
         if (confirm('Excluir da nuvem?')) { 
             await _supabase.from('entries').delete().eq('id', id); 
             fetchEntries(); 
@@ -297,6 +309,7 @@
     }
 
     function editEntry(id) { 
+        if(!isAdmin) return;
         const e = entries.find(x => x.id == id); 
         document.getElementById('edit-id').value = e.id;
         document.getElementById('input-date').value = e.date;
@@ -309,13 +322,13 @@
     }
 
     function exportData() {
-        if (!validarAcesso()) return;
+        if(!isAdmin) return;
         const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_resgate_cloud.json`; a.click();
     }
 
     function importData() {
-        if (!validarAcesso()) return;
+        if(!isAdmin) return;
         const input = document.createElement('input'); input.type = 'file';
         input.onchange = e => {
             const reader = new FileReader();
@@ -336,7 +349,7 @@
     }
 
     async function clearAll() { 
-        if (!validarAcesso()) return;
+        if(!isAdmin) return;
         if (confirm('Apagar TUDO da Nuvem?')) { 
             await _supabase.from('entries').delete().neq('id', 0); 
             fetchEntries(); 
