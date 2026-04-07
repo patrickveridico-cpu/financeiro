@@ -53,6 +53,10 @@
         #history-list { max-height: 400px; overflow-y: auto; }
         .history-item { font-size: 0.75rem; padding: 10px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 
+        .action-icons { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { cursor: pointer; opacity: 0.7; transition: 0.2s; }
+        .icon-btn:hover { opacity: 1; transform: scale(1.1); }
+
         @media (max-width: 1024px) {
             .dashboard-grid { grid-template-columns: 1fr; }
             header { justify-content: center; padding: 20px; }
@@ -164,7 +168,6 @@
         }
 
         function render() {
-            // Pegar data atual sem horas para comparação justa
             const hojeStr = new Date().toLocaleDateString('en-CA'); 
             let sHoje = 0, sRestante = 0, sLiq = 0, sTotal = 0, segTotals = {};
             
@@ -180,12 +183,8 @@
                 sTotal += e.value;
                 segTotals[e.seguradora] = (segTotals[e.seguradora] || 0) + e.value;
 
-                if (e.date === hojeStr) {
-                    sHoje += e.value;
-                    sRestante += e.value;
-                    groups[e.date] = groups[e.date] || [];
-                    groups[e.date].push(e);
-                } else if (e.date > hojeStr) {
+                if (e.date >= hojeStr) {
+                    if (e.date === hojeStr) sHoje += e.value;
                     sRestante += e.value;
                     groups[e.date] = groups[e.date] || [];
                     groups[e.date].push(e);
@@ -200,7 +199,7 @@
             document.getElementById('stat-liquidados').innerText = formatCurrency(sLiq);
             document.getElementById('stat-total').innerText = formatCurrency(sTotal);
 
-            // Render Feed Principal
+            // Feed Principal
             Object.keys(groups).sort().forEach(date => {
                 const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
                 const div = document.createElement('div');
@@ -214,9 +213,12 @@
                         ${groups[date].map(e => `
                             <div class="entry-row">
                                 <span><b>${e.seguradora}</b> <small style="display:block; opacity:0.6">${e.desc || ''}</small></span>
-                                <div style="display:flex; align-items:center; gap:12px;">
+                                <div class="action-icons">
                                     <b>${formatCurrency(e.value)}</b>
-                                    ${isAdmin ? `<span onclick="editEntry(${e.id})" style="cursor:pointer">✏️</span>` : ''}
+                                    ${isAdmin ? `
+                                        <span class="icon-btn" onclick="editEntry(${e.id})">✏️</span>
+                                        <span class="icon-btn" onclick="deleteEntry(${e.id})">🗑️</span>
+                                    ` : ''}
                                 </div>
                             </div>
                         `).join('')}
@@ -224,15 +226,15 @@
                 listCont.appendChild(div);
             });
 
-            // Render Histórico (Ordenado do mais recente para o mais antigo)
+            // Histórico
             historyItems.sort((a,b) => b.date.localeCompare(a.date)).forEach(e => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
                     <span>${e.date.split('-').reverse().slice(0,2).join('/')} - ${e.seguradora}</span>
-                    <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="action-icons">
                         <b>${formatCurrency(e.value)}</b>
-                        ${isAdmin ? `<span onclick="deleteEntry(${e.id})" style="cursor:pointer; font-size:10px;">🗑️</span>` : ''}
+                        ${isAdmin ? `<span class="icon-btn" onclick="deleteEntry(${e.id})" style="font-size:10px;">🗑️</span>` : ''}
                     </div>`;
                 histCont.appendChild(div);
             });
@@ -307,7 +309,12 @@
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        async function deleteEntry(id) { if(confirm('Excluir?') && prompt("Senha:") === MASTER_PASS) { await _supabase.from('entries').delete().eq('id', id); fetchEntries(); } }
+        async function deleteEntry(id) { 
+            if(confirm('Tem certeza que deseja excluir este lançamento?') && prompt("Confirme a Senha Admin:") === MASTER_PASS) { 
+                await _supabase.from('entries').delete().eq('id', id); 
+                fetchEntries(); 
+            } 
+        }
 
         fetchEntries();
     </script>
