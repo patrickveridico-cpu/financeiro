@@ -228,9 +228,35 @@
         /* Stats */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
             margin-bottom: 24px;
+        }
+
+        .dashboard-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin: -8px 0 20px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 12px;
+        }
+
+        .dashboard-total .label, .stat-meta {
+            color: var(--text-secondary);
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+
+        .dashboard-total .value {
+            color: var(--primary);
+            font-size: 1rem;
+            font-weight: 800;
         }
 
         .stat-card {
@@ -413,6 +439,11 @@
             box-shadow: 0 0 30px rgba(201, 168, 76, 0.1);
         }
 
+        .day-group.overdue {
+            border-color: var(--danger);
+            box-shadow: 0 0 30px rgba(248, 113, 113, 0.08);
+        }
+
         .day-group .day-header {
             display: flex;
             justify-content: space-between;
@@ -491,6 +522,52 @@
             display: flex;
             gap: 4px;
         }
+
+        /* Liquidated entries shown in today's forecast */
+        .entry-row.liquidated-today {
+            margin: 4px -6px;
+            padding: 10px 8px;
+            border: 1px solid rgba(74, 222, 128, 0.32);
+            border-radius: 10px;
+            background: linear-gradient(90deg, rgba(74, 222, 128, 0.11), rgba(74, 222, 128, 0.025));
+            box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.8);
+        }
+
+        .entry-row.liquidated-today .entry-info .main,
+        .entry-row.liquidated-today .entry-value {
+            color: var(--success);
+        }
+
+        .liquidated-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            width: fit-content;
+            margin-top: 4px;
+            padding: 3px 7px;
+            border: 1px solid rgba(74, 222, 128, 0.28);
+            border-radius: 999px;
+            background: rgba(74, 222, 128, 0.09);
+            color: var(--success);
+            font-size: 0.55rem;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+        }
+
+        .day-summary {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            font-size: 0.62rem;
+            color: var(--text-secondary);
+        }
+
+        .day-summary strong { color: var(--text-primary); }
+        .day-summary .received strong { color: var(--success); }
+        .day-summary .remaining strong { color: var(--warning); }
 
         /* History */
         .history-item {
@@ -627,6 +704,45 @@
             text-align: center;
         }
 
+        .btn:disabled {
+            cursor: wait;
+            opacity: 0.6;
+            transform: none;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 18px;
+            right: 18px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: min(360px, calc(100vw - 36px));
+            pointer-events: none;
+        }
+
+        .toast {
+            padding: 12px 14px;
+            border: 1px solid var(--border-glass);
+            border-left: 3px solid var(--primary);
+            border-radius: 10px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+            font-size: 0.78rem;
+            animation: toastIn 0.25s ease;
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.warning { border-left-color: var(--warning); }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(16px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         /* Empty */
         .empty-state {
             text-align: center;
@@ -652,7 +768,7 @@
                 gap: 16px;
             }
             .stats-grid {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(3, minmax(0, 1fr));
             }
             .logo-img {
                 height: 110px;
@@ -726,25 +842,36 @@
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="label">📊 Hoje</div>
+                <div class="label">Previsto hoje</div>
                 <div class="value" id="stat-hoje">R$ 0,00</div>
             </div>
             <div class="stat-card pending">
-                <div class="label">⏳ Pendentes</div>
-                <div class="value" id="stat-pendentes">R$ 0,00</div>
-            </div>
-            <div class="stat-card highlight">
-                <div class="label">✅ Liquidados</div>
-                <div class="value" id="stat-liquidados">R$ 0,00</div>
+                <div class="label">Próximos recebimentos</div>
+                <div class="value" id="stat-proximos">R$ 0,00</div>
             </div>
             <div class="stat-card inadimplente">
-                <div class="label">⚠️ Inadimplentes</div>
-                <div class="value" id="stat-inadimplentes">R$ 0,00</div>
+                <div class="label">Atrasados</div>
+                <div class="value" id="stat-atrasados">R$ 0,00</div>
+                <div class="stat-meta" id="stat-atrasados-count">0 lançamentos</div>
             </div>
             <div class="stat-card">
-                <div class="label">💰 Total Geral</div>
-                <div class="value" id="stat-total">R$ 0,00</div>
+                <div class="label">Sem previsão</div>
+                <div class="value" id="stat-sem-previsao">R$ 0,00</div>
+                <div class="stat-meta" id="stat-sem-previsao-count">0 lançamentos</div>
             </div>
+            <div class="stat-card inadimplente">
+                <div class="label">Inadimplentes</div>
+                <div class="value" id="stat-inadimplentes">R$ 0,00</div>
+                <div class="stat-meta" id="stat-inadimplentes-count">0 lançamentos</div>
+            </div>
+            <div class="stat-card highlight">
+                <div class="label">Liquidado no mês</div>
+                <div class="value" id="stat-liquidado-mes">R$ 0,00</div>
+            </div>
+        </div>
+        <div class="dashboard-total">
+            <span class="label">Total a receber</span>
+            <span class="value" id="stat-total-receber">R$ 0,00</span>
         </div>
 
         <!-- Dashboard -->
@@ -780,7 +907,7 @@
                                 <option value="inadimplente">⚠️ Inadimplente</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width:100%;">💾 Salvar Lançamento</button>
+                        <button type="submit" class="btn btn-primary" id="save-entry-button" style="width:100%;">💾 Salvar Lançamento</button>
                     </form>
 
                     <!-- Quick Actions -->
@@ -820,13 +947,13 @@
             <div class="right-column">
                 <!-- Sem Previsão -->
                 <div class="card">
-                    <div class="card-title">⏰ <span class="accent">Sem Previsão de Pagamento</span></div>
+                    <div class="card-title">⏰ <span class="accent">Sem Previsão de Pagamento</span> <span class="stat-meta" id="no-preview-summary"></span></div>
                     <div id="no-preview-list"></div>
                 </div>
 
                 <!-- Inadimplentes -->
                 <div class="card">
-                    <div class="card-title">⚠️ <span class="danger">Inadimplentes</span></div>
+                    <div class="card-title">⚠️ <span class="danger">Inadimplentes</span> <span class="stat-meta" id="inadimplentes-summary"></span></div>
                     <div id="inadimplentes-list"></div>
                 </div>
             </div>
@@ -841,7 +968,7 @@
             <div class="details" id="modal-details"></div>
             <div class="actions">
                 <button class="btn" onclick="closeModal()">Cancelar</button>
-                <button class="btn btn-success" onclick="confirmPayment()">✅ Confirmar Pagamento</button>
+                <button class="btn btn-success" id="confirm-payment-button" onclick="confirmPayment()">✅ Confirmar Pagamento</button>
             </div>
         </div>
     </div>
@@ -849,12 +976,12 @@
     <!-- Adiar Modal -->
     <div class="modal-overlay" id="adiar-modal">
         <div class="modal">
-            <h2>⏰ Adiar Pagamento</h2>
-            <p style="color:var(--text-secondary);">Este item será movido para "Sem Previsão".</p>
+            <h2>⏰ Mover para Sem Previsão</h2>
+            <p style="color:var(--text-secondary);">Este item ficará sem uma data prevista de pagamento.</p>
             <div class="details" id="adiar-details"></div>
             <div class="actions">
                 <button class="btn" onclick="closeAdiarModal()">Cancelar</button>
-                <button class="btn btn-warning" onclick="confirmAdiar()">⏰ Adiar</button>
+                <button class="btn btn-warning" id="confirm-adiar-button" onclick="confirmAdiar()">⏰ Mover para Sem Previsão</button>
             </div>
         </div>
     </div>
@@ -867,10 +994,12 @@
             <div class="details" id="inadimplente-details"></div>
             <div class="actions">
                 <button class="btn" onclick="closeInadimplenteModal()">Cancelar</button>
-                <button class="btn btn-danger" onclick="confirmInadimplente()">⚠️ Marcar</button>
+                <button class="btn btn-danger" id="confirm-inadimplente-button" onclick="confirmInadimplente()">⚠️ Marcar</button>
             </div>
         </div>
     </div>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <script>
         // ===== CONFIG =====
@@ -884,6 +1013,51 @@
         let confirmEntryId = null;
         let adiarEntryId = null;
         let inadimplenteEntryId = null;
+        let isPaymentSaving = false;
+        let isAdiarSaving = false;
+        let isInadimplenteSaving = false;
+        let isFormSaving = false;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4200);
+        }
+
+        function setButtonLoading(buttonId, loading, loadingText) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            const modal = button.closest('.modal');
+            if (loading) {
+                button.dataset.originalText = button.innerHTML;
+                if (modal) modal.querySelectorAll('button').forEach(item => item.disabled = true);
+                else button.disabled = true;
+                button.textContent = loadingText;
+            } else {
+                if (modal) modal.querySelectorAll('button').forEach(item => item.disabled = false);
+                else button.disabled = false;
+                if (button.dataset.originalText) button.innerHTML = button.dataset.originalText;
+            }
+        }
+
+        function isMissingPaidAtColumn(error) {
+            const text = [error?.message, error?.details, error?.hint].filter(Boolean).join(' ');
+            return /paid_at/i.test(text) && (
+                /column|schema cache|does not exist|could not find/i.test(text) ||
+                ['PGRST204', '42703'].includes(error?.code)
+            );
+        }
+
+        function isMissingStatusColumn(error) {
+            const text = [error?.message, error?.details, error?.hint].filter(Boolean).join(' ');
+            return /status/i.test(text) && (
+                /column|schema cache|does not exist|could not find/i.test(text) ||
+                ['PGRST204', '42703'].includes(error?.code)
+            );
+        }
 
         // ===== THEME =====
         function toggleTheme() {
@@ -907,14 +1081,68 @@
 
         // ===== FORMAT =====
         function formatCurrency(v) {
-            return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatSummary(items) {
+            const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+            return `${items.length} lançamento${items.length === 1 ? '' : 's'} • ${formatCurrency(total)}`;
+        }
+
+        // Compatibilidade com dados legados do sistema antigo:
+        // - registros NOVOS possuem status explícito e seguem a nova lógica;
+        // - registros ANTIGOS sem status e com data passada eram considerados históricos
+        //   pelo sistema original, portanto continuam como liquidados apenas para exibição;
+        // - registros sem status com data de hoje/futura permanecem pendentes.
+        function getEntryStatus(entry) {
+            const validStatuses = ['pendente', 'sem_previsao', 'inadimplente', 'liquidado'];
+            if (validStatuses.includes(entry.status)) return entry.status;
+
+            if (!entry.date) return 'sem_previsao';
+            return entry.date < getTodayString() ? 'liquidado' : 'pendente';
+        }
+
+        function isOverdue(entry, hojeStr) {
+            return getEntryStatus(entry) === 'pendente' && !!entry.date && entry.date < hojeStr;
+        }
+
+        function getTodayString() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatDateBR(date) {
+            if (!date) return 'Sem data';
+            const [year, month, day] = date.slice(0, 10).split('-');
+            return year && month && day ? `${day}/${month}/${year}` : date;
+        }
+
+        function getOverdueDays(date, hojeStr) {
+            const [year, month, day] = date.split('-').map(Number);
+            const [todayYear, todayMonth, todayDay] = hojeStr.split('-').map(Number);
+            return Math.round((new Date(todayYear, todayMonth - 1, todayDay) - new Date(year, month - 1, day)) / 86400000);
         }
 
         // ===== FETCH =====
         async function fetchEntries() {
-            const { data } = await _supabase.from('entries').select('*').order('date', { ascending: true });
-            entries = data || [];
-            render();
+            try {
+                const { data, error } = await _supabase.from('entries').select('*').order('date', { ascending: true });
+                if (error) {
+                    console.error(error);
+                    showToast('Não foi possível sincronizar os lançamentos.', 'error');
+                    return false;
+                }
+                entries = data || [];
+                render();
+                return true;
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível sincronizar os lançamentos.', 'error');
+                return false;
+            }
         }
 
         // ===== FILTERS =====
@@ -925,54 +1153,52 @@
 
             const filtered = entries.filter(e => {
                 const matchNF = e.desc ? e.desc.toLowerCase().includes(nfFilter) : true;
-                const matchSeg = e.seguradora.toLowerCase().includes(segFilter);
-                const matchVal = e.value >= valFilter;
-                const isPendente = e.status !== 'inadimplente' && e.status !== 'sem_previsao';
-                return matchNF && matchSeg && matchVal && isPendente;
+                const matchSeg = (e.seguradora || '').toLowerCase().includes(segFilter);
+                const matchVal = Number(e.value || 0) >= valFilter;
+                return matchNF && matchSeg && matchVal && getEntryStatus(e) === 'pendente' && !!e.date;
             });
 
             renderFiltered(filtered);
         }
 
         function renderFiltered(filtered) {
-            const hojeStr = new Date().toLocaleDateString('en-CA');
+            const hojeStr = getTodayString();
             const groups = {};
-            const historyItems = [];
-
             filtered.forEach(e => {
-                if (!e.date || e.date === '') {
-                    // These go to no-preview
-                } else if (e.date >= hojeStr) {
-                    groups[e.date] = groups[e.date] || [];
-                    groups[e.date].push(e);
-                } else {
-                    historyItems.push(e);
-                }
+                groups[e.date] = groups[e.date] || [];
+                groups[e.date].push(e);
             });
 
             renderFeed(groups, hojeStr);
-            renderHistory(historyItems);
             updateStats(entries);
         }
 
         // ===== RENDER =====
         function render() {
-            const hojeStr = new Date().toLocaleDateString('en-CA');
+            const hojeStr = getTodayString();
             const groups = {};
             const historyItems = [];
             const noPreview = [];
             const inadimplentes = [];
 
             entries.forEach(e => {
-                if (e.status === 'inadimplente') {
+                const status = getEntryStatus(e);
+
+                if (status === 'liquidado') {
+                    historyItems.push(e);
+                    // Liquidado cuja previsão era hoje continua visível apenas durante o dia,
+                    // permitindo acompanhar previsto x recebido x faltante.
+                    if (e.date === hojeStr) {
+                        groups[e.date] = groups[e.date] || [];
+                        groups[e.date].push(e);
+                    }
+                } else if (status === 'inadimplente') {
                     inadimplentes.push(e);
-                } else if (e.status === 'sem_previsao' || !e.date || e.date === '') {
+                } else if (status === 'sem_previsao') {
                     noPreview.push(e);
-                } else if (e.date >= hojeStr) {
+                } else if (status === 'pendente' && e.date) {
                     groups[e.date] = groups[e.date] || [];
                     groups[e.date].push(e);
-                } else {
-                    historyItems.push(e);
                 }
             });
 
@@ -993,39 +1219,67 @@
             }
 
             Object.keys(groups).sort().forEach(date => {
+                const dayEntries = groups[date];
                 const isToday = date === hojeStr;
-                const totalDia = groups[date].reduce((s, x) => s + x.value, 0);
+                const isOverdueDay = dayEntries.some(entry => isOverdue(entry, hojeStr));
+                const previstoDia = dayEntries.reduce((s, x) => s + Number(x.value || 0), 0);
+                const recebidoDia = isToday
+                    ? dayEntries.filter(x => getEntryStatus(x) === 'liquidado').reduce((s, x) => s + Number(x.value || 0), 0)
+                    : 0;
+                const faltaDia = isToday
+                    ? dayEntries.filter(x => getEntryStatus(x) === 'pendente').reduce((s, x) => s + Number(x.value || 0), 0)
+                    : previstoDia;
+
                 const div = document.createElement('div');
-                div.className = `day-group ${openDays[date] ? 'active' : ''} ${isToday ? 'today' : ''}`;
-                
+                div.className = `day-group ${openDays[date] ? 'active' : ''} ${isToday ? 'today' : ''} ${isOverdueDay ? 'overdue' : ''}`;
+
                 let dateLabel = date.split('-').reverse().slice(0,2).join('/');
                 if (isToday) dateLabel += ' 🔴 HOJE';
+
+                if (isOverdueDay) {
+                    const overdueDays = getOverdueDays(date, hojeStr);
+                    dateLabel += ` • ${overdueDays} DIA${overdueDays === 1 ? '' : 'S'} DE ATRASO`;
+                }
+
+                const headerValue = isToday
+                    ? `<div class="day-summary">
+                            <span>PREVISTO <strong>${formatCurrency(previstoDia)}</strong></span>
+                            <span class="received">RECEBIDO <strong>${formatCurrency(recebidoDia)}</strong></span>
+                            <span class="remaining">FALTA <strong>${formatCurrency(faltaDia)}</strong></span>
+                       </div>`
+                    : `<span class="total">${formatCurrency(previstoDia)}</span>`;
 
                 div.innerHTML = `
                     <div class="day-header" onclick="toggleDay('${date}')">
                         <span class="date">📅 ${dateLabel}</span>
-                        <span class="total">${formatCurrency(totalDia)}</span>
+                        ${headerValue}
                     </div>
                     <div class="day-content">
-                        ${groups[date].map(e => `
-                            <div class="entry-row">
+                        ${dayEntries.map(e => {
+                            const status = getEntryStatus(e);
+                            const isLiquidatedToday = isToday && status === 'liquidado';
+                            return `
+                            <div class="entry-row ${isLiquidatedToday ? 'liquidated-today' : ''}">
                                 <div class="entry-info">
                                     <span class="main">${e.seguradora}</span>
                                     <span class="sub">${e.desc || 'Sem obs'}</span>
+                                    ${isLiquidatedToday
+                                        ? `<span class="liquidated-badge">✓ LIQUIDADO${e.paid_at ? ` • ${new Date(e.paid_at).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}` : ''}</span>`
+                                        : (isOverdue(e, hojeStr) ? '<span class="sub" style="color:var(--danger);font-weight:700;">ATRASADO</span>' : '')}
                                 </div>
                                 <div class="entry-value">${formatCurrency(e.value)}</div>
-                                ${isToday ? `
+                                ${isLiquidatedToday ? '' : `
                                     <div class="entry-actions">
+                                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
                                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
                                         <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
                                         <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `).join('')}
+                                    </div>`}
+                            </div>`;
+                        }).join('')}
                         ${isToday ? `
                             <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-glass);text-align:center;font-size:0.65rem;color:var(--text-secondary);">
-                                🔴 Itens de hoje: Confirmar ✅ | Adiar ⏰ | Inadimplente ⚠️
+                                🟢 Liquidado &nbsp;•&nbsp; Pendentes: Confirmar ✅ | Sem previsão ⏰ | Inadimplente ⚠️
                             </div>
                         ` : ''}
                     </div>
@@ -1043,13 +1297,13 @@
                 return;
             }
 
-            historyItems.sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20).forEach(e => {
+            historyItems.sort((a,b) => (b.paid_at || b.date || '').localeCompare(a.paid_at || a.date || '')).slice(0, 20).forEach(e => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
                 div.innerHTML = `
                     <div class="info">
                         <span>${e.seguradora}</span>
-                        <span class="date">${e.date.split('-').reverse().slice(0,2).join('/')}</span>
+                        <span class="date">${e.desc || 'Sem obs'} • Previsto: ${formatDateBR(e.date)}${e.paid_at ? ` • Pago: ${formatDateBR(e.paid_at)}` : ''}</span>
                     </div>
                     <span style="font-weight:600;color:var(--success);">${formatCurrency(e.value)}</span>
                 `;
@@ -1060,6 +1314,7 @@
         function renderNoPreview(noPreview) {
             const container = document.getElementById('no-preview-list');
             container.innerHTML = '';
+            document.getElementById('no-preview-summary').innerText = formatSummary(noPreview);
 
             if (noPreview.length === 0) {
                 container.innerHTML = `<div class="empty-small">Nenhum item sem previsão</div>`;
@@ -1073,6 +1328,7 @@
                     <span>${e.seguradora} ${e.desc ? '- ' + e.desc : ''}</span>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="color:var(--primary);font-weight:700;font-size:0.8rem;">${formatCurrency(e.value)}</span>
+                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
                         <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
                     </div>
@@ -1084,6 +1340,7 @@
         function renderInadimplentes(inadimplentes) {
             const container = document.getElementById('inadimplentes-list');
             container.innerHTML = '';
+            document.getElementById('inadimplentes-summary').innerText = formatSummary(inadimplentes);
 
             if (inadimplentes.length === 0) {
                 container.innerHTML = `<div class="empty-small">Nenhum inadimplente</div>`;
@@ -1097,6 +1354,7 @@
                     <span>${e.seguradora} ${e.desc ? '- ' + e.desc : ''}</span>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="color:var(--danger);font-weight:700;font-size:0.8rem;">${formatCurrency(e.value)}</span>
+                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
                     </div>
                 `;
@@ -1105,27 +1363,47 @@
         }
 
         function updateStats(entriesList) {
-            const hojeStr = new Date().toLocaleDateString('en-CA');
-            let sHoje = 0, sPendentes = 0, sLiq = 0, sTotal = 0, sInadimplentes = 0;
+            const hojeStr = getTodayString();
+            const currentMonth = hojeStr.slice(0, 7);
+            const totals = {
+                hoje: 0, proximos: 0, atrasados: 0, atrasadosCount: 0,
+                semPrevisao: 0, semPrevisaoCount: 0,
+                inadimplentes: 0, inadimplentesCount: 0,
+                liquidadoMes: 0, totalReceber: 0
+            };
 
-            entriesList.forEach(e => {
-                sTotal += e.value;
-                if (e.status === 'inadimplente') {
-                    sInadimplentes += e.value;
-                } else if (e.status === 'sem_previsao' || !e.date || e.date === '') {
-                    sPendentes += e.value;
-                } else if (e.date >= hojeStr) {
-                    if (e.date === hojeStr) sHoje += e.value;
-                } else {
-                    sLiq += e.value;
+            entriesList.forEach(entry => {
+                const value = Number(entry.value || 0);
+                const status = getEntryStatus(entry);
+                if (status !== 'liquidado') totals.totalReceber += value;
+                // Previsto hoje preserva o total original do dia mesmo após confirmações.
+                if ((status === 'pendente' || status === 'liquidado') && entry.date === hojeStr) totals.hoje += value;
+                if (status === 'pendente' && entry.date > hojeStr) totals.proximos += value;
+                if (isOverdue(entry, hojeStr)) {
+                    totals.atrasados += value;
+                    totals.atrasadosCount += 1;
                 }
+                if (status === 'sem_previsao') {
+                    totals.semPrevisao += value;
+                    totals.semPrevisaoCount += 1;
+                }
+                if (status === 'inadimplente') {
+                    totals.inadimplentes += value;
+                    totals.inadimplentesCount += 1;
+                }
+                if (status === 'liquidado' && (entry.paid_at || entry.date || '').slice(0, 7) === currentMonth) totals.liquidadoMes += value;
             });
 
-            document.getElementById('stat-hoje').innerText = formatCurrency(sHoje);
-            document.getElementById('stat-pendentes').innerText = formatCurrency(sPendentes);
-            document.getElementById('stat-liquidados').innerText = formatCurrency(sLiq);
-            document.getElementById('stat-inadimplentes').innerText = formatCurrency(sInadimplentes);
-            document.getElementById('stat-total').innerText = formatCurrency(sTotal);
+            document.getElementById('stat-hoje').innerText = formatCurrency(totals.hoje);
+            document.getElementById('stat-proximos').innerText = formatCurrency(totals.proximos);
+            document.getElementById('stat-atrasados').innerText = formatCurrency(totals.atrasados);
+            document.getElementById('stat-atrasados-count').innerText = `${totals.atrasadosCount} lançamento${totals.atrasadosCount === 1 ? '' : 's'}`;
+            document.getElementById('stat-sem-previsao').innerText = formatCurrency(totals.semPrevisao);
+            document.getElementById('stat-sem-previsao-count').innerText = `${totals.semPrevisaoCount} lançamento${totals.semPrevisaoCount === 1 ? '' : 's'}`;
+            document.getElementById('stat-inadimplentes').innerText = formatCurrency(totals.inadimplentes);
+            document.getElementById('stat-inadimplentes-count').innerText = `${totals.inadimplentesCount} lançamento${totals.inadimplentesCount === 1 ? '' : 's'}`;
+            document.getElementById('stat-liquidado-mes').innerText = formatCurrency(totals.liquidadoMes);
+            document.getElementById('stat-total-receber').innerText = formatCurrency(totals.totalReceber);
         }
 
         // ===== TOGGLE =====
@@ -1155,19 +1433,44 @@
         }
 
         async function confirmPayment() {
-            if (!confirmEntryId) return;
+            if (!confirmEntryId || isPaymentSaving) return;
             
             const entry = entries.find(e => e.id == confirmEntryId);
             if (!entry) return;
 
-            const hojeStr = new Date().toLocaleDateString('en-CA');
-            await _supabase.from('entries').update({ 
-                date: hojeStr,
-                status: 'liquidado'
-            }).eq('id', confirmEntryId);
-            
-            closeModal();
-            fetchEntries();
+            isPaymentSaving = true;
+            setButtonLoading('confirm-payment-button', true, 'Salvando...');
+            try {
+                // A data prevista (date) é preservada; paid_at é a data real de pagamento.
+                let result = await _supabase.from('entries').update({
+                    status: 'liquidado',
+                    paid_at: new Date().toISOString()
+                }).eq('id', confirmEntryId);
+
+                // Compatibilidade exclusiva para banco sem a coluna paid_at.
+                if (result.error && isMissingPaidAtColumn(result.error)) {
+                    result = await _supabase.from('entries').update({ status: 'liquidado' }).eq('id', confirmEntryId);
+                }
+                if (result.error) {
+                    console.error('Erro ao confirmar pagamento:', result.error);
+                    if (isMissingStatusColumn(result.error)) {
+                        showToast('O banco precisa da coluna status para confirmar pagamentos.', 'error');
+                    } else {
+                        showToast('Não foi possível confirmar o pagamento. Verifique o console para o detalhe técnico.', 'error');
+                    }
+                    return;
+                }
+
+                closeModal();
+                showToast('Pagamento confirmado.');
+                await fetchEntries();
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível confirmar o pagamento.', 'error');
+            } finally {
+                isPaymentSaving = false;
+                setButtonLoading('confirm-payment-button', false);
+            }
         }
 
         // ===== ADIAR =====
@@ -1189,15 +1492,31 @@
         }
 
         async function confirmAdiar() {
-            if (!adiarEntryId) return;
+            if (!adiarEntryId || isAdiarSaving) return;
             
-            await _supabase.from('entries').update({ 
-                date: null,
-                status: 'sem_previsao'
-            }).eq('id', adiarEntryId);
-            
-            closeAdiarModal();
-            fetchEntries();
+            isAdiarSaving = true;
+            setButtonLoading('confirm-adiar-button', true, 'Salvando...');
+            try {
+                const { error } = await _supabase.from('entries').update({
+                    date: null,
+                    status: 'sem_previsao'
+                }).eq('id', adiarEntryId);
+                if (error) {
+                    console.error(error);
+                    showToast('Não foi possível mover para Sem Previsão.', 'error');
+                    return;
+                }
+
+                closeAdiarModal();
+                showToast('Movido para Sem Previsão.');
+                await fetchEntries();
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível mover para Sem Previsão.', 'error');
+            } finally {
+                isAdiarSaving = false;
+                setButtonLoading('confirm-adiar-button', false);
+            }
         }
 
         // ===== INADIMPLENTE =====
@@ -1219,15 +1538,50 @@
         }
 
         async function confirmInadimplente() {
-            if (!inadimplenteEntryId) return;
+            if (!inadimplenteEntryId || isInadimplenteSaving) return;
             
-            await _supabase.from('entries').update({ 
-                status: 'inadimplente',
-                date: null
-            }).eq('id', inadimplenteEntryId);
-            
-            closeInadimplenteModal();
-            fetchEntries();
+            isInadimplenteSaving = true;
+            setButtonLoading('confirm-inadimplente-button', true, 'Salvando...');
+            try {
+                const { error } = await _supabase.from('entries').update({
+                    status: 'inadimplente',
+                    date: null
+                }).eq('id', inadimplenteEntryId);
+                if (error) {
+                    console.error(error);
+                    showToast('Não foi possível marcar como inadimplente.', 'error');
+                    return;
+                }
+
+                closeInadimplenteModal();
+                showToast('Marcado como inadimplente.');
+                await fetchEntries();
+            } catch (error) {
+                console.error(error);
+                showToast('Não foi possível marcar como inadimplente.', 'error');
+            } finally {
+                isInadimplenteSaving = false;
+                setButtonLoading('confirm-inadimplente-button', false);
+            }
+        }
+
+        // ===== EDIT =====
+        function editEntry(id) {
+            const entry = entries.find(e => e.id == id);
+            if (!entry) return;
+
+            const status = getEntryStatus(entry);
+            if (status === 'liquidado') return;
+
+            document.getElementById('edit-id').value = entry.id;
+            document.getElementById('input-date').value = entry.date || '';
+            document.getElementById('input-seguradora').value = entry.seguradora || '';
+            document.getElementById('input-value').value = Number(entry.value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            document.getElementById('input-desc').value = entry.desc || '';
+            document.getElementById('input-status').value = status;
+            document.getElementById('input-status').dispatchEvent(new Event('change'));
+            document.getElementById('input-seguradora').focus();
+            document.getElementById('entry-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
         // ===== FORM =====
@@ -1250,37 +1604,68 @@
 
         document.getElementById('entry-form').onsubmit = async (e) => {
             e.preventDefault();
+            if (isFormSaving) return;
             
-            const val = parseFloat(document.getElementById('input-value').value.replace(/\./g, '').replace(',', '.'));
+            const valueInput = document.getElementById('input-value').value.trim();
+            const val = parseFloat(valueInput.replace(/\./g, '').replace(',', '.'));
             const status = document.getElementById('input-status').value;
             let date = document.getElementById('input-date').value || null;
+            const seguradora = document.getElementById('input-seguradora').value.trim();
+            const desc = document.getElementById('input-desc').value.trim();
+
+            if (!valueInput || !Number.isFinite(val) || val <= 0) {
+                showToast('Informe um valor válido maior que zero.', 'warning');
+                return;
+            }
+            if (!seguradora) {
+                showToast('Informe a seguradora.', 'warning');
+                return;
+            }
             
             if (status === 'sem_previsao' || status === 'inadimplente') {
                 date = null;
             }
+            if (status === 'pendente' && !date) {
+                showToast('Informe a data prevista para salvar um lançamento pendente.', 'warning');
+                return;
+            }
 
             const data = {
                 date: date,
-                seguradora: document.getElementById('input-seguradora').value.toUpperCase(),
+                seguradora: seguradora.toUpperCase(),
                 value: val,
-                desc: document.getElementById('input-desc').value.toUpperCase(),
+                desc: desc.toUpperCase(),
                 status: status
             };
 
             const id = document.getElementById('edit-id').value;
+            isFormSaving = true;
+            setButtonLoading('save-entry-button', true, 'Salvando...');
             try {
+                let error;
                 if (id) {
-                    await _supabase.from('entries').update(data).eq('id', id);
+                    ({ error } = await _supabase.from('entries').update(data).eq('id', id));
                 } else {
-                    await _supabase.from('entries').insert([data]);
+                    ({ error } = await _supabase.from('entries').insert([data]));
                 }
+                if (error) {
+                    console.error(error);
+                    showToast('Não foi possível salvar o lançamento.', 'error');
+                    return;
+                }
+
                 document.getElementById('entry-form').reset();
                 document.getElementById('edit-id').value = '';
                 document.getElementById('input-date').disabled = false;
                 document.getElementById('input-date').style.opacity = '1';
-                fetchEntries();
+                showToast(id ? 'Lançamento atualizado com sucesso.' : 'Lançamento salvo com sucesso.');
+                await fetchEntries();
             } catch (error) {
-                alert('Erro ao salvar: ' + error.message);
+                console.error(error);
+                showToast('Não foi possível salvar o lançamento.', 'error');
+            } finally {
+                isFormSaving = false;
+                setButtonLoading('save-entry-button', false);
             }
         };
 
