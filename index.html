@@ -761,6 +761,70 @@
             padding: 6px 0;
         }
 
+
+        /* Auth / Access Mode */
+        .admin-only { display: none !important; }
+        body.admin-mode .admin-only { display: block !important; }
+        body.admin-mode .entry-actions.admin-only,
+        body.admin-mode .actions.admin-only { display: flex !important; }
+
+        .access-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .access-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 12px;
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .access-badge.admin {
+            color: var(--success);
+            border-color: rgba(74, 222, 128, 0.28);
+            background: rgba(74, 222, 128, 0.07);
+        }
+
+        .login-modal-note {
+            color: var(--text-secondary);
+            font-size: 0.72rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .login-error {
+            display: none;
+            margin-top: 10px;
+            padding: 9px 11px;
+            border-radius: 9px;
+            border: 1px solid rgba(248, 113, 113, 0.25);
+            background: rgba(248, 113, 113, 0.07);
+            color: var(--danger);
+            font-size: 0.7rem;
+        }
+
+        .visitor-note {
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            border: 1px solid rgba(201, 168, 76, 0.18);
+            border-radius: 10px;
+            background: rgba(201, 168, 76, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.68rem;
+            line-height: 1.45;
+        }
+
         /* Responsive */
         @media (max-width: 1400px) {
             .dashboard-grid {
@@ -833,6 +897,11 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="access-control">
+                    <span class="access-badge" id="access-badge">👁️ Visitante</span>
+                    <button class="btn" id="auth-button" onclick="handleAuthButton()">🔒 Acesso Admin</button>
+                    <button class="btn admin-only" id="logout-button" onclick="logoutAdmin()">Sair</button>
+                </div>
                 <button class="btn" onclick="toggleTheme()">🌓</button>
                 <button class="btn btn-primary" onclick="fetchEntries()">🔄 Sincronizar</button>
                 <button class="btn" onclick="exportData()">📥 Exportar</button>
@@ -878,8 +947,12 @@
         <div class="dashboard-grid">
             <!-- Left Column -->
             <div class="left-column">
+                <div class="visitor-note" id="visitor-note">
+                    👁️ Você está em modo visitante. Os dados financeiros estão disponíveis apenas para consulta.
+                </div>
+
                 <!-- Formulário de Cadastro -->
-                <div class="card">
+                <div class="card admin-only">
                     <div class="card-title">✏️ <span class="accent">Cadastrar Nota / Lançamento</span></div>
                     <form id="entry-form">
                         <input type="hidden" id="edit-id">
@@ -999,11 +1072,33 @@
         </div>
     </div>
 
+    <!-- Admin Login Modal -->
+    <div class="modal-overlay" id="login-modal">
+        <div class="modal">
+            <h2>🔒 Acesso Administrativo</h2>
+            <p class="login-modal-note">Entre com a conta administrativa cadastrada no Supabase. Visitantes continuam com acesso somente para consulta.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" class="form-control" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <input type="password" id="login-password" class="form-control" autocomplete="current-password" required>
+                </div>
+                <div class="login-error" id="login-error"></div>
+                <div class="actions">
+                    <button type="button" class="btn" id="login-cancel-button" onclick="closeLoginModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="login-submit-button">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <script>
         // ===== CONFIG =====
-        const MASTER_PASS = "Murrilho123*";
         const SUPABASE_URL = 'https://glmyblygbvhpluwncbtm.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdsbXlibHlnYnZocGx1d25jYnRtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1NDY2MTQsImV4cCI6MjA5MTEyMjYxNH0.PqdwEYVYXIvOh2pYqQwaq8eyf2ZWS6BalQzOpINrXts';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1017,6 +1112,91 @@
         let isAdiarSaving = false;
         let isInadimplenteSaving = false;
         let isFormSaving = false;
+        let isAdmin = false;
+        let currentUser = null;
+        let isLoginSaving = false;
+
+
+        // ===== AUTH =====
+        function applyAccessMode(session) {
+            currentUser = session?.user || null;
+            isAdmin = !!currentUser;
+
+            document.body.classList.toggle('admin-mode', isAdmin);
+
+            const badge = document.getElementById('access-badge');
+            const authButton = document.getElementById('auth-button');
+            const visitorNote = document.getElementById('visitor-note');
+
+            if (badge) {
+                badge.classList.toggle('admin', isAdmin);
+                badge.textContent = isAdmin ? '● Administrador' : '👁️ Visitante';
+                badge.title = isAdmin && currentUser?.email ? currentUser.email : 'Acesso somente leitura';
+            }
+
+            if (authButton) {
+                authButton.style.display = isAdmin ? 'none' : '';
+            }
+
+            if (visitorNote) {
+                visitorNote.style.display = isAdmin ? 'none' : '';
+            }
+
+            if (typeof render === 'function' && entries.length) render();
+        }
+
+        function requireAdmin() {
+            if (isAdmin) return true;
+            showToast('Ação disponível somente para o administrador.', 'warning');
+            return false;
+        }
+
+        async function initAuth() {
+            const { data, error } = await _supabase.auth.getSession();
+            if (error) {
+                console.error('Erro ao recuperar sessão:', error);
+                applyAccessMode(null);
+            } else {
+                applyAccessMode(data?.session || null);
+            }
+
+            _supabase.auth.onAuthStateChange((_event, session) => {
+                applyAccessMode(session);
+            });
+        }
+
+        function handleAuthButton() {
+            if (isAdmin) return;
+            const modal = document.getElementById('login-modal');
+            const errorBox = document.getElementById('login-error');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+                errorBox.textContent = '';
+            }
+            modal?.classList.add('active');
+            setTimeout(() => document.getElementById('login-email')?.focus(), 50);
+        }
+
+        function closeLoginModal() {
+            if (isLoginSaving) return;
+            document.getElementById('login-modal')?.classList.remove('active');
+            const errorBox = document.getElementById('login-error');
+            if (errorBox) {
+                errorBox.style.display = 'none';
+                errorBox.textContent = '';
+            }
+        }
+
+        async function logoutAdmin() {
+            if (!isAdmin) return;
+            const { error } = await _supabase.auth.signOut();
+            if (error) {
+                console.error('Erro ao sair:', error);
+                showToast('Não foi possível encerrar a sessão.', 'error');
+                return;
+            }
+            showToast('Sessão administrativa encerrada.');
+        }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -1070,6 +1250,7 @@
 
         // ===== QUICK ADD =====
         function quickAdd(status) {
+            if (!requireAdmin()) return;
             document.getElementById('input-status').value = status;
             if (status === 'sem_previsao' || status === 'inadimplente') {
                 document.getElementById('input-date').value = '';
@@ -1268,16 +1449,16 @@
                                         : (isOverdue(e, hojeStr) ? '<span class="sub" style="color:var(--danger);font-weight:700;">ATRASADO</span>' : '')}
                                 </div>
                                 <div class="entry-value">${formatCurrency(e.value)}</div>
-                                ${isLiquidatedToday ? '' : `
+                                ${(!isLiquidatedToday && isAdmin) ? `
                                     <div class="entry-actions">
                                         <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
                                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
                                         <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
                                         <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
-                                    </div>`}
+                                    </div>` : ''}
                             </div>`;
                         }).join('')}
-                        ${isToday ? `
+                        ${(isToday && isAdmin) ? `
                             <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-glass);text-align:center;font-size:0.65rem;color:var(--text-secondary);">
                                 🟢 Liquidado &nbsp;•&nbsp; Pendentes: Confirmar ✅ | Sem previsão ⏰ | Inadimplente ⚠️
                             </div>
@@ -1328,9 +1509,11 @@
                     <span>${e.seguradora} ${e.desc ? '- ' + e.desc : ''}</span>
                     <div style="display:flex;align-items:center;gap:10px;">
                         <span style="color:var(--primary);font-weight:700;font-size:0.8rem;">${formatCurrency(e.value)}</span>
+                        ${isAdmin ? `
+                        ${isAdmin ? `
                         <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
-                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>` : ''}
+                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>` : ''}
                     </div>
                 `;
                 container.appendChild(div);
@@ -1414,6 +1597,7 @@
 
         // ===== CONFIRM PAYMENT =====
         function openConfirmModal(id) {
+            if (!requireAdmin()) return;
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             confirmEntryId = id;
@@ -1433,6 +1617,7 @@
         }
 
         async function confirmPayment() {
+            if (!requireAdmin()) return;
             if (!confirmEntryId || isPaymentSaving) return;
             
             const entry = entries.find(e => e.id == confirmEntryId);
@@ -1475,6 +1660,7 @@
 
         // ===== ADIAR =====
         function openAdiarModal(id) {
+            if (!requireAdmin()) return;
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             adiarEntryId = id;
@@ -1492,6 +1678,7 @@
         }
 
         async function confirmAdiar() {
+            if (!requireAdmin()) return;
             if (!adiarEntryId || isAdiarSaving) return;
             
             isAdiarSaving = true;
@@ -1521,6 +1708,7 @@
 
         // ===== INADIMPLENTE =====
         function openInadimplenteModal(id) {
+            if (!requireAdmin()) return;
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             inadimplenteEntryId = id;
@@ -1538,6 +1726,7 @@
         }
 
         async function confirmInadimplente() {
+            if (!requireAdmin()) return;
             if (!inadimplenteEntryId || isInadimplenteSaving) return;
             
             isInadimplenteSaving = true;
@@ -1567,6 +1756,7 @@
 
         // ===== EDIT =====
         function editEntry(id) {
+            if (!requireAdmin()) return;
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
 
@@ -1604,6 +1794,7 @@
 
         document.getElementById('entry-form').onsubmit = async (e) => {
             e.preventDefault();
+            if (!requireAdmin()) return;
             if (isFormSaving) return;
             
             const valueInput = document.getElementById('input-value').value.trim();
@@ -1669,6 +1860,54 @@
             }
         };
 
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (isLoginSaving) return;
+
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorBox = document.getElementById('login-error');
+            const submitButton = document.getElementById('login-submit-button');
+
+            if (!email || !password) {
+                errorBox.textContent = 'Informe e-mail e senha.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            isLoginSaving = true;
+            submitButton.disabled = true;
+            submitButton.dataset.originalText = submitButton.innerHTML;
+            submitButton.textContent = 'Entrando...';
+            document.getElementById('login-cancel-button').disabled = true;
+            errorBox.style.display = 'none';
+
+            try {
+                const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+                if (error || !data?.session) {
+                    console.error('Falha no login:', error);
+                    errorBox.textContent = 'E-mail ou senha inválidos.';
+                    errorBox.style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('login-form').reset();
+                document.getElementById('login-modal').classList.remove('active');
+                showToast('Acesso administrativo liberado.');
+            } catch (error) {
+                console.error('Erro no login:', error);
+                errorBox.textContent = 'Não foi possível entrar agora. Tente novamente.';
+                errorBox.style.display = 'block';
+            } finally {
+                isLoginSaving = false;
+                submitButton.disabled = false;
+                document.getElementById('login-cancel-button').disabled = false;
+                if (submitButton.dataset.originalText) submitButton.innerHTML = submitButton.dataset.originalText;
+            }
+        });
+
         // ===== EXPORT =====
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(entries));
@@ -1679,6 +1918,7 @@
         }
 
         // ===== INIT =====
+        initAuth();
         fetchEntries();
     </script>
 </body>
