@@ -574,6 +574,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
             padding: 8px 0;
             border-bottom: 1px solid var(--border-glass);
             font-size: 0.75rem;
@@ -586,11 +588,29 @@
         .history-item .info {
             display: flex;
             flex-direction: column;
+            flex: 1 1 140px;
+            min-width: 0;
+            overflow-wrap: anywhere;
         }
 
         .history-item .info .date {
             font-size: 0.6rem;
             color: var(--text-secondary);
+        }
+
+        .history-item-side {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        .history-item-value {
+            color: var(--success);
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         /* Filters */
@@ -629,18 +649,55 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
             padding: 6px 0;
             font-size: 0.8rem;
             border-bottom: 1px solid var(--border-glass);
+            min-width: 0;
         }
 
         .status-item:last-child {
             border-bottom: none;
         }
 
-        .status-item .actions {
+        .status-item-info {
+            display: flex;
+            flex: 1 1 120px;
+            min-width: 0;
+            flex-direction: column;
+            gap: 2px;
+            overflow-wrap: anywhere;
+        }
+
+        .status-item-side {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            flex: 1 1 auto;
+            flex-wrap: wrap;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        .status-item-value {
+            font-weight: 700;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .status-item-actions {
             display: flex;
             gap: 4px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            max-width: 100%;
+        }
+
+        .status-item-actions .btn-small {
+            padding-left: 9px;
+            padding-right: 9px;
         }
 
         /* Modal */
@@ -1018,6 +1075,12 @@
 
             <!-- Right Column -->
             <div class="right-column">
+                <!-- Pendentes vencidos -->
+                <div class="card">
+                    <div class="card-title">⏳ <span class="danger">Pendentes</span> <span class="stat-meta" id="pendentes-summary"></span></div>
+                    <div id="pendentes-list"></div>
+                </div>
+
                 <!-- Sem Previsão -->
                 <div class="card">
                     <div class="card-title">⏰ <span class="accent">Sem Previsão de Pagamento</span> <span class="stat-meta" id="no-preview-summary"></span></div>
@@ -1072,6 +1135,20 @@
         </div>
     </div>
 
+    <!-- Excluir Lançamento Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h2 style="color:var(--danger);">🗑️ Excluir Lançamento</h2>
+            <p style="color:var(--text-secondary);">Tem certeza que deseja excluir este lançamento?</p>
+            <div class="details" id="delete-details"></div>
+            <p style="color:var(--danger);font-size:0.75rem;font-weight:700;">Esta ação não poderá ser desfeita.</p>
+            <div class="actions">
+                <button class="btn" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn btn-danger" id="confirm-delete-button" onclick="confirmDeleteEntry()">Excluir lançamento</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Admin Login Modal -->
     <div class="modal-overlay" id="login-modal">
         <div class="modal">
@@ -1108,9 +1185,11 @@
         let confirmEntryId = null;
         let adiarEntryId = null;
         let inadimplenteEntryId = null;
+        let deleteEntryId = null;
         let isPaymentSaving = false;
         let isAdiarSaving = false;
         let isInadimplenteSaving = false;
+        let isDeleteSaving = false;
         let isFormSaving = false;
         let isAdmin = false;
         let currentUser = null;
@@ -1270,6 +1349,25 @@
             return `${items.length} lançamento${items.length === 1 ? '' : 's'} • ${formatCurrency(total)}`;
         }
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatStatusLabel(entry) {
+            const labels = {
+                pendente: 'Pendente',
+                sem_previsao: 'Sem Previsão',
+                inadimplente: 'Inadimplente',
+                liquidado: 'Liquidado'
+            };
+            return labels[getEntryStatus(entry)] || 'Pendente';
+        }
+
         // Compatibilidade com dados legados do sistema antigo:
         // - registros NOVOS possuem status explícito e seguem a nova lógica;
         // - registros ANTIGOS sem status e com data passada eram considerados históricos
@@ -1331,12 +1429,13 @@
             const nfFilter = document.getElementById('filter-nf').value.toLowerCase();
             const segFilter = document.getElementById('filter-seguradora').value.toLowerCase();
             const valFilter = parseFloat(document.getElementById('filter-valor').value.replace(',', '.')) || 0;
+            const hojeStr = getTodayString();
 
             const filtered = entries.filter(e => {
                 const matchNF = e.desc ? e.desc.toLowerCase().includes(nfFilter) : true;
                 const matchSeg = (e.seguradora || '').toLowerCase().includes(segFilter);
                 const matchVal = Number(e.value || 0) >= valFilter;
-                return matchNF && matchSeg && matchVal && getEntryStatus(e) === 'pendente' && !!e.date;
+                return matchNF && matchSeg && matchVal && getEntryStatus(e) === 'pendente' && !!e.date && !isOverdue(e, hojeStr);
             });
 
             renderFiltered(filtered);
@@ -1361,6 +1460,7 @@
             const historyItems = [];
             const noPreview = [];
             const inadimplentes = [];
+            const overduePending = [];
 
             entries.forEach(e => {
                 const status = getEntryStatus(e);
@@ -1377,6 +1477,8 @@
                     inadimplentes.push(e);
                 } else if (status === 'sem_previsao') {
                     noPreview.push(e);
+                } else if (isOverdue(e, hojeStr)) {
+                    overduePending.push(e);
                 } else if (status === 'pendente' && e.date) {
                     groups[e.date] = groups[e.date] || [];
                     groups[e.date].push(e);
@@ -1387,6 +1489,7 @@
             renderHistory(historyItems);
             renderNoPreview(noPreview);
             renderInadimplentes(inadimplentes);
+            renderPendentes(overduePending, hojeStr);
             updateStats(entries);
         }
 
@@ -1455,6 +1558,7 @@
                                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
                                         <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
                                         <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
                                     </div>` : ''}
                             </div>`;
                         }).join('')}
@@ -1483,10 +1587,13 @@
                 div.className = 'history-item';
                 div.innerHTML = `
                     <div class="info">
-                        <span>${e.seguradora}</span>
-                        <span class="date">${e.desc || 'Sem obs'} • Previsto: ${formatDateBR(e.date)}${e.paid_at ? ` • Pago: ${formatDateBR(e.paid_at)}` : ''}</span>
+                        <span>${escapeHtml(e.seguradora)}</span>
+                        <span class="date">${escapeHtml(e.desc || 'Sem obs')} • Previsto: ${formatDateBR(e.date)}${e.paid_at ? ` • Pago: ${formatDateBR(e.paid_at)}` : ''}</span>
                     </div>
-                    <span style="font-weight:600;color:var(--success);">${formatCurrency(e.value)}</span>
+                    <div class="history-item-side">
+                        <span class="history-item-value">${formatCurrency(e.value)}</span>
+                        ${isAdmin ? `<button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>` : ''}
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -1506,14 +1613,15 @@
                 const div = document.createElement('div');
                 div.className = 'status-item';
                 div.innerHTML = `
-                    <span>${e.seguradora} ${e.desc ? '- ' + e.desc : ''}</span>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span style="color:var(--primary);font-weight:700;font-size:0.8rem;">${formatCurrency(e.value)}</span>
-                        ${isAdmin ? `
-                        ${isAdmin ? `
+                    <div class="status-item-info">${escapeHtml(e.seguradora)} ${e.desc ? '- ' + escapeHtml(e.desc) : ''}</div>
+                    <div class="status-item-side">
+                        <span class="status-item-value" style="color:var(--primary);">${formatCurrency(e.value)}</span>
+                        ${isAdmin ? `<div class="status-item-actions">
                         <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>` : ''}
-                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>` : ''}
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
+                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
+                        </div>` : ''}
                     </div>
                 `;
                 container.appendChild(div);
@@ -1534,11 +1642,49 @@
                 const div = document.createElement('div');
                 div.className = 'status-item';
                 div.innerHTML = `
-                    <span>${e.seguradora} ${e.desc ? '- ' + e.desc : ''}</span>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <span style="color:var(--danger);font-weight:700;font-size:0.8rem;">${formatCurrency(e.value)}</span>
+                    <div class="status-item-info">${escapeHtml(e.seguradora)} ${e.desc ? '- ' + escapeHtml(e.desc) : ''}</div>
+                    <div class="status-item-side">
+                        <span class="status-item-value" style="color:var(--danger);">${formatCurrency(e.value)}</span>
+                        ${isAdmin ? `<div class="status-item-actions">
                         <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
                         <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
+                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
+                        </div>` : ''}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderPendentes(pendentes, hojeStr = getTodayString()) {
+            const container = document.getElementById('pendentes-list');
+            container.innerHTML = '';
+            document.getElementById('pendentes-summary').innerText = formatSummary(pendentes);
+
+            if (pendentes.length === 0) {
+                container.innerHTML = `<div class="empty-small">Nenhum pagamento pendente vencido</div>`;
+                return;
+            }
+
+            [...pendentes].sort((a, b) => (a.date || '').localeCompare(b.date || '')).forEach(e => {
+                const overdueDays = getOverdueDays(e.date, hojeStr);
+                const div = document.createElement('div');
+                div.className = 'status-item';
+                div.innerHTML = `
+                    <div class="status-item-info">
+                        <strong>${escapeHtml(e.seguradora)}</strong>
+                        <span style="font-size:0.68rem;color:var(--text-secondary);">${escapeHtml(e.desc || 'Sem obs')}</span>
+                        <span style="font-size:0.62rem;color:var(--danger);font-weight:700;">Previsto: ${formatDateBR(e.date)} • ${overdueDays} dia${overdueDays === 1 ? '' : 's'} de atraso</span>
+                    </div>
+                    <div class="status-item-side">
+                        <span class="status-item-value" style="color:var(--danger);">${formatCurrency(e.value)}</span>
+                        ${isAdmin ? `<div class="status-item-actions">
+                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
+                        <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
+                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
+                        </div>` : ''}
                     </div>
                 `;
                 container.appendChild(div);
@@ -1751,6 +1897,65 @@
             } finally {
                 isInadimplenteSaving = false;
                 setButtonLoading('confirm-inadimplente-button', false);
+            }
+        }
+
+        // ===== DELETE =====
+        function openDeleteModal(id) {
+            if (!requireAdmin()) return;
+            const entry = entries.find(e => e.id == id);
+            if (!entry) return;
+
+            deleteEntryId = entry.id;
+            document.getElementById('delete-details').innerHTML = `
+                <div><strong>Seguradora:</strong> ${escapeHtml(entry.seguradora || 'N/A')}</div>
+                <div><strong>NF/Observação:</strong> ${escapeHtml(entry.desc || 'N/A')}</div>
+                <div><strong>Valor:</strong> ${formatCurrency(entry.value)}</div>
+                ${entry.date ? `<div><strong>Data prevista:</strong> ${formatDateBR(entry.date)}</div>` : ''}
+                ${entry.paid_at ? `<div><strong>Pago em:</strong> ${formatDateBR(entry.paid_at)}</div>` : ''}
+                <div><strong>Status atual:</strong> ${formatStatusLabel(entry)}</div>
+            `;
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('active');
+            deleteEntryId = null;
+        }
+
+        async function confirmDeleteEntry() {
+            if (!requireAdmin()) return;
+            if (deleteEntryId == null || isDeleteSaving) return;
+
+            const entry = entries.find(e => e.id == deleteEntryId);
+            if (!entry) {
+                closeDeleteModal();
+                return;
+            }
+
+            isDeleteSaving = true;
+            setButtonLoading('confirm-delete-button', true, 'Excluindo...');
+            try {
+                const { error } = await _supabase
+                    .from('entries')
+                    .delete()
+                    .eq('id', deleteEntryId);
+
+                if (error) {
+                    console.error('Erro ao excluir lançamento:', error);
+                    showToast('Não foi possível excluir o lançamento.', 'error');
+                    return;
+                }
+
+                closeDeleteModal();
+                showToast('Lançamento excluído com sucesso.');
+                await fetchEntries();
+            } catch (error) {
+                console.error('Erro ao excluir lançamento:', error);
+                showToast('Não foi possível excluir o lançamento.', 'error');
+            } finally {
+                isDeleteSaving = false;
+                setButtonLoading('confirm-delete-button', false);
             }
         }
 
