@@ -14,7 +14,7 @@
             --primary-dark: #a8892e;
             --primary-glow: rgba(201, 168, 76, 0.3);
             --bg-primary: #0a0a0f;
-            --bg-secondary: #12121a;
+            --bg-secondary: rgba(18, 18, 26, 0.91);
             --bg-card: rgba(255, 255, 255, 0.03);
             --border-glass: rgba(255, 255, 255, 0.06);
             --text-primary: #f0ece6;
@@ -29,7 +29,7 @@
 
         [data-theme="light"] {
             --bg-primary: #f5f0eb;
-            --bg-secondary: #ffffff;
+            --bg-secondary: rgba(255, 255, 255, 0.95);
             --bg-card: rgba(0, 0, 0, 0.02);
             --border-glass: rgba(0, 0, 0, 0.08);
             --text-primary: #1a1a1a;
@@ -43,6 +43,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             background: var(--bg-primary);
             color: var(--text-primary);
@@ -50,7 +54,204 @@
             min-height: 100vh;
             transition: background 0.4s ease, color 0.4s ease;
             padding: 16px;
+            position: relative;
+            isolation: isolate;
+            overflow-x: hidden;
         }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::before {
+            background:
+                radial-gradient(circle at 50% -10%, rgba(201, 168, 76, 0.09), transparent 46%),
+                linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 32%);
+        }
+
+        body::after {
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.3) 100%);
+            opacity: 0.76;
+        }
+
+        body[data-theme="light"]::before { opacity: 0.34; }
+        body[data-theme="light"]::after { opacity: 0.12; }
+
+        /* ===== MOTION 2.2 / GRAPHIC AMBIENT SCENE ===== */
+        .ambient-background {
+            --ambient-far-x: 0px;
+            --ambient-far-y: 0px;
+            --ambient-mid-x: 0px;
+            --ambient-mid-y: 0px;
+            --ambient-near-x: 0px;
+            --ambient-near-y: 0px;
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 1;
+            contain: strict;
+            transition: opacity 0.4s ease;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(201, 168, 76, 0.16), transparent 27%),
+                radial-gradient(circle at 88% 76%, rgba(134, 83, 30, 0.14), transparent 31%);
+        }
+
+        .ambient-grid,
+        .ambient-orbit,
+        .ambient-ribbon,
+        .ambient-beam {
+            position: absolute;
+            display: block;
+            pointer-events: none;
+            will-change: transform, opacity;
+            animation-play-state: running;
+        }
+
+        .ambient-grid {
+            inset: -120px;
+            z-index: 0;
+            opacity: 0.28;
+            background-image:
+                linear-gradient(rgba(201, 168, 76, 0.16) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201, 168, 76, 0.16) 1px, transparent 1px);
+            background-size: 96px 96px;
+            mask-image: radial-gradient(ellipse at center, black 12%, transparent 82%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 12%, transparent 82%);
+            translate: var(--ambient-far-x) var(--ambient-far-y);
+            animation: ambientGridDrift 22s linear infinite;
+        }
+
+        .ambient-orbit {
+            z-index: 1;
+            border-radius: 50%;
+            border: 1px solid rgba(226, 188, 88, 0.38);
+            box-shadow:
+                inset 0 0 34px rgba(201, 168, 76, 0.08),
+                0 0 28px rgba(201, 168, 76, 0.1);
+            translate: var(--ambient-far-x) var(--ambient-far-y);
+        }
+
+        .ambient-orbit::before,
+        .ambient-orbit::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .ambient-orbit::before {
+            inset: 8%;
+            border: 1px dashed rgba(201, 168, 76, 0.2);
+        }
+
+        .ambient-orbit::after {
+            inset: -3px;
+            border-top: 4px solid rgba(255, 220, 126, 0.86);
+            border-right: 3px solid transparent;
+            filter: drop-shadow(0 0 9px rgba(245, 205, 103, 0.72));
+        }
+
+        .ambient-orbit-1 {
+            width: clamp(720px, 78vw, 1180px);
+            height: clamp(720px, 78vw, 1180px);
+            top: -54%;
+            right: -25%;
+            animation: ambientOrbitOne 34s linear infinite;
+        }
+
+        .ambient-orbit-2 {
+            width: clamp(620px, 68vw, 980px);
+            height: clamp(620px, 68vw, 980px);
+            bottom: -58%;
+            left: -24%;
+            border-color: rgba(181, 122, 48, 0.34);
+            animation: ambientOrbitTwo 41s linear -13s infinite reverse;
+        }
+
+        .ambient-ribbon {
+            z-index: 2;
+            width: 118vw;
+            height: clamp(130px, 16vw, 250px);
+            border-radius: 50%;
+            border: 2px solid rgba(224, 179, 71, 0.32);
+            background: linear-gradient(180deg, rgba(245, 205, 103, 0.18), rgba(201, 168, 76, 0.055) 38%, transparent 72%);
+            box-shadow: 0 -14px 48px rgba(201, 168, 76, 0.12);
+            filter: blur(0.4px);
+            translate: var(--ambient-mid-x) var(--ambient-mid-y);
+        }
+
+        .ambient-ribbon-1 {
+            top: 10%;
+            left: 22%;
+            animation: ambientRibbonOne 14s ease-in-out -2s infinite alternate;
+        }
+
+        .ambient-ribbon-2 {
+            bottom: 1%;
+            right: 18%;
+            opacity: 0.76;
+            animation: ambientRibbonTwo 18s ease-in-out -7s infinite alternate;
+        }
+
+        .ambient-beam {
+            z-index: 3;
+            width: max(32vw, 420px);
+            height: 190vh;
+            top: -45vh;
+            background: linear-gradient(90deg, transparent 3%, rgba(201, 168, 76, 0.06) 25%, rgba(255, 222, 133, 0.24) 50%, rgba(201, 168, 76, 0.075) 72%, transparent 97%);
+            filter: blur(22px);
+            opacity: 0;
+            translate: var(--ambient-near-x) var(--ambient-near-y);
+        }
+
+        .ambient-beam-1 {
+            left: -66vw;
+            animation: ambientBeamOne 10s cubic-bezier(0.45, 0, 0.22, 1) -2s infinite;
+        }
+
+        .ambient-beam-2 {
+            right: -64vw;
+            width: max(22vw, 340px);
+            animation: ambientBeamTwo 12s cubic-bezier(0.45, 0, 0.22, 1) -6s infinite;
+        }
+
+        .ambient-details {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            transform: translate3d(var(--ambient-near-x), var(--ambient-near-y), 0);
+        }
+
+        .ambient-detail {
+            position: absolute;
+            display: block;
+            width: 8px;
+            height: 8px;
+            border: 1px solid rgba(245, 205, 103, 0.68);
+            transform: rotate(45deg);
+            box-shadow: 0 0 12px rgba(201, 168, 76, 0.42);
+            animation: ambientDetailFloat 9s ease-in-out infinite alternate;
+        }
+
+        .ambient-detail:nth-child(1) { top: 16%; left: 8%; }
+        .ambient-detail:nth-child(2) { top: 27%; right: 14%; width: 5px; height: 5px; animation-delay: -3s; }
+        .ambient-detail:nth-child(3) { top: 61%; left: 18%; border-radius: 50%; animation-delay: -7s; }
+        .ambient-detail:nth-child(4) { bottom: 17%; right: 9%; width: 12px; height: 2px; animation-delay: -5s; }
+        .ambient-detail:nth-child(5) { top: 43%; left: 53%; width: 4px; height: 4px; border-radius: 50%; animation-delay: -9s; }
+        .ambient-detail:nth-child(6) { bottom: 31%; right: 31%; width: 10px; height: 10px; animation-delay: -2s; }
+
+        body[data-theme="light"] .ambient-background {
+            opacity: 0.31;
+            filter: saturate(0.72);
+        }
+
+        body[data-theme="light"] .ambient-grid { opacity: 0.18; }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-primary); }
@@ -59,6 +260,8 @@
         .container {
             max-width: 1600px;
             margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
 
         /* Header */
@@ -257,6 +460,125 @@
             color: var(--primary);
             font-size: 1rem;
             font-weight: 800;
+        }
+
+        /* Global Search */
+        .global-search-section {
+            margin-bottom: 20px;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-glass);
+            border-radius: 14px;
+        }
+
+        .global-search-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .global-search-input {
+            flex: 1 1 300px;
+            min-width: 0;
+        }
+
+        .global-search-results {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-glass);
+        }
+
+        .global-search-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .global-search-title {
+            color: var(--primary);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .global-search-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: 8px;
+        }
+
+        .global-search-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 0;
+            padding: 12px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-glass);
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .global-search-item-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .global-search-item-info {
+            display: flex;
+            flex: 1 1 140px;
+            min-width: 0;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .global-search-item-info strong {
+            font-size: 0.82rem;
+        }
+
+        .global-search-item-info span,
+        .global-search-meta {
+            color: var(--text-secondary);
+            font-size: 0.66rem;
+        }
+
+        .global-search-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .global-search-value {
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .global-search-status {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .global-search-status.liquidado { color: var(--success); }
+        .global-search-status.inadimplente,
+        .global-search-status.atrasado { color: var(--danger); }
+        .global-search-status.sem-previsao { color: var(--warning); }
+        .global-search-status.pendente { color: var(--primary); }
+
+        .global-search-item .status-item-actions {
+            padding-top: 8px;
+            border-top: 1px solid var(--border-glass);
         }
 
         .stat-card {
@@ -471,13 +793,36 @@
         }
 
         .day-group .day-content {
-            display: none;
-            padding: 10px 16px;
-            border-top: 1px solid var(--border-glass);
+            display: grid;
+            grid-template-rows: 0fr;
+            padding: 0 16px;
+            border-top: 0 solid transparent;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition:
+                grid-template-rows 0.36s ease,
+                padding 0.36s ease,
+                border-color 0.25s ease,
+                opacity 0.24s ease,
+                transform 0.3s ease,
+                visibility 0s linear 0.36s;
+        }
+
+        .day-content-inner {
+            min-height: 0;
+            overflow: hidden;
         }
 
         .day-group.active .day-content {
-            display: block;
+            grid-template-rows: 1fr;
+            padding: 10px 16px;
+            border-top-width: 1px;
+            border-top-color: var(--border-glass);
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            transition-delay: 0s;
         }
 
         .entry-row {
@@ -882,6 +1227,477 @@
             line-height: 1.45;
         }
 
+        /* ===== PREMIUM MOTION / MICROINTERACTIONS ===== */
+        @keyframes ambientGridDrift {
+            from { background-position: 0 0, 0 0; }
+            to { background-position: 96px 48px, 48px 96px; }
+        }
+
+        @keyframes ambientOrbitOne {
+            0% { transform: translate3d(-12px, -8px, 0) rotate(0deg) scale(0.98); }
+            50% { transform: translate3d(24px, 18px, 0) rotate(184deg) scale(1.035); }
+            100% { transform: translate3d(-12px, -8px, 0) rotate(360deg) scale(0.98); }
+        }
+
+        @keyframes ambientOrbitTwo {
+            0% { transform: translate3d(18px, 12px, 0) rotate(-12deg) scale(1); }
+            50% { transform: translate3d(-26px, -18px, 0) rotate(170deg) scale(1.045); }
+            100% { transform: translate3d(18px, 12px, 0) rotate(348deg) scale(1); }
+        }
+
+        @keyframes ambientRibbonOne {
+            from { transform: translate3d(-4vw, -5vh, 0) rotate(-18deg) scaleX(0.94); }
+            to { transform: translate3d(-18vw, 11vh, 0) rotate(-10deg) scaleX(1.06); }
+        }
+
+        @keyframes ambientRibbonTwo {
+            from { transform: translate3d(8vw, 8vh, 0) rotate(20deg) scaleX(1.06); }
+            to { transform: translate3d(24vw, -10vh, 0) rotate(11deg) scaleX(0.94); }
+        }
+
+        @keyframes ambientBeamOne {
+            0% { transform: translate3d(-12vw, 0, 0) rotate(18deg); opacity: 0; }
+            12% { opacity: 0.74; }
+            76% { opacity: 0.52; }
+            100% { transform: translate3d(190vw, 0, 0) rotate(18deg); opacity: 0; }
+        }
+
+        @keyframes ambientBeamTwo {
+            0% { transform: translate3d(10vw, 0, 0) rotate(-21deg); opacity: 0; }
+            14% { opacity: 0.5; }
+            78% { opacity: 0.34; }
+            100% { transform: translate3d(-185vw, 0, 0) rotate(-21deg); opacity: 0; }
+        }
+
+        @keyframes ambientDetailFloat {
+            from { translate: 0 -3px; opacity: 0.42; }
+            to { translate: 8px 8px; opacity: 0.9; }
+        }
+
+        @keyframes headerGlowDrift {
+            0% { transform: translate3d(-3%, 0, 0) scale(1); opacity: 0.07; }
+            50% { transform: translate3d(4%, 2%, 0) scale(1.04); opacity: 0.13; }
+            100% { transform: translate3d(0, -2%, 0) scale(1.01); opacity: 0.09; }
+        }
+
+        @keyframes todayGlow {
+            0%, 100% { box-shadow: 0 0 24px rgba(201, 168, 76, 0.08); }
+            50% { box-shadow: 0 0 34px rgba(201, 168, 76, 0.16); }
+        }
+
+        @keyframes entryReveal {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes liquidatedReveal {
+            0% { opacity: 0; transform: translateY(4px) scale(0.99); box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.8), 0 0 0 rgba(74, 222, 128, 0); }
+            35% { opacity: 1; transform: translateY(0) scale(1.005); box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.9), 0 0 22px rgba(74, 222, 128, 0.18); }
+            100% { opacity: 1; transform: translateY(0) scale(1); box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.8), 0 0 0 rgba(74, 222, 128, 0); }
+        }
+
+        @keyframes badgeReveal {
+            from { opacity: 0; transform: scale(0.94); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes modalOverlayIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes searchResultsReveal {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes statValuePulse {
+            0% { opacity: 0.65; transform: scale(0.985); filter: brightness(1); }
+            45% { opacity: 1; transform: scale(1.018); filter: brightness(1.18); }
+            100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+        }
+
+        .header-premium::before {
+            animation: headerGlowDrift 22s ease-in-out infinite alternate;
+            will-change: transform, opacity;
+        }
+
+        .header-premium,
+        .stat-card,
+        .card,
+        .day-group,
+        .global-search-item {
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease,
+                background-color 0.25s ease;
+        }
+
+        .logo-img {
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+        .btn {
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.22s ease,
+                filter 0.22s ease,
+                border-color 0.22s ease;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0) scale(0.97);
+            transition-duration: 0.08s;
+        }
+
+        .btn:focus-visible,
+        .day-header:focus-visible,
+        .form-control:focus-visible,
+        .filter-input:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .day-group .day-header,
+        .day-group .day-header .total,
+        .day-summary strong {
+            transition: transform 0.22s ease, color 0.22s ease, text-shadow 0.22s ease, background-color 0.22s ease;
+        }
+
+        .day-group.today {
+            animation: todayGlow 5.5s ease-in-out infinite;
+        }
+
+        .day-group.overdue {
+            box-shadow: 0 0 24px rgba(248, 113, 113, 0.09);
+        }
+
+        .day-group.active .entry-row {
+            animation: entryReveal 0.3s ease both;
+        }
+
+        .day-group.active .entry-row:nth-child(1) { animation-delay: 30ms; }
+        .day-group.active .entry-row:nth-child(2) { animation-delay: 60ms; }
+        .day-group.active .entry-row:nth-child(3) { animation-delay: 90ms; }
+        .day-group.active .entry-row:nth-child(4) { animation-delay: 120ms; }
+        .day-group.active .entry-row:nth-child(5) { animation-delay: 150ms; }
+        .day-group.active .entry-row:nth-child(6) { animation-delay: 180ms; }
+        .day-group.active .entry-row:nth-child(7) { animation-delay: 220ms; }
+        .day-group.active .entry-row:nth-child(n+8) { animation-delay: 260ms; }
+
+        .day-group.active .entry-row.liquidated-today {
+            animation: liquidatedReveal 1.05s ease both;
+        }
+
+        .day-group.active .liquidated-badge {
+            animation: badgeReveal 0.35s 0.12s ease both;
+        }
+
+        .modal-overlay.active {
+            animation: modalOverlayIn 0.22s ease both;
+        }
+
+        .modal-overlay.active .modal {
+            animation: modalSlide 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .global-search-results:not([hidden]) {
+            animation: searchResultsReveal 0.25s ease both;
+        }
+
+        .global-search-item {
+            animation: searchResultsReveal 0.28s ease both;
+        }
+
+        .global-search-item:nth-child(2) { animation-delay: 35ms; }
+        .global-search-item:nth-child(3) { animation-delay: 70ms; }
+        .global-search-item:nth-child(4) { animation-delay: 105ms; }
+        .global-search-item:nth-child(n+5) { animation-delay: 140ms; }
+
+        .global-search-status.liquidado {
+            text-shadow: 0 0 12px rgba(74, 222, 128, 0.18);
+        }
+
+        .global-search-status.inadimplente,
+        .global-search-status.atrasado {
+            text-shadow: 0 0 12px rgba(248, 113, 113, 0.15);
+        }
+
+        .stat-value-updated {
+            animation: statValuePulse 0.42s ease both;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .stat-card:hover {
+                transform: translateY(-3px) scale(1.01);
+                border-color: rgba(201, 168, 76, 0.34);
+                box-shadow: 0 14px 38px rgba(0, 0, 0, 0.34), 0 0 22px rgba(201, 168, 76, 0.08);
+            }
+
+            .card:hover {
+                transform: translateY(-2px);
+                border-color: rgba(201, 168, 76, 0.28);
+                box-shadow: 0 12px 34px rgba(0, 0, 0, 0.22);
+            }
+
+            .day-group:hover {
+                transform: translateY(-1px);
+                border-color: rgba(201, 168, 76, 0.5);
+                box-shadow: 0 9px 24px rgba(0, 0, 0, 0.22), 0 0 18px rgba(201, 168, 76, 0.07);
+            }
+
+            .day-group:hover .day-header {
+                background: rgba(201, 168, 76, 0.065);
+            }
+
+            .day-group:hover .day-header .total,
+            .day-group:hover .day-summary strong {
+                color: #f5d77b;
+                text-shadow: 0 0 12px rgba(201, 168, 76, 0.2);
+                transform: scale(1.015);
+            }
+
+            .global-search-item:hover {
+                transform: translateY(-2px);
+                border-color: rgba(201, 168, 76, 0.3);
+                box-shadow: 0 9px 24px rgba(0, 0, 0, 0.22);
+            }
+
+            .btn:hover:not(:disabled) {
+                filter: brightness(1.06);
+            }
+
+            .btn-small:hover:not(:disabled) {
+                transform: translateY(-1px) scale(1.025);
+            }
+
+            .logo-img:hover {
+                transform: scale(1.035);
+                filter: drop-shadow(0 6px 28px rgba(201, 168, 76, 0.5));
+            }
+        }
+
+        /* ===== PREMIUM MOTION 2.0 / JS INTERACTIONS ===== */
+        @keyframes entryHighlightGold {
+            0% { box-shadow: 0 0 0 rgba(201, 168, 76, 0); transform: scale(0.995); }
+            35% { box-shadow: 0 0 24px rgba(201, 168, 76, 0.24); transform: scale(1.008); }
+            100% { box-shadow: 0 0 0 rgba(201, 168, 76, 0); transform: scale(1); }
+        }
+
+        @keyframes entryHighlightGreen {
+            0% { background: rgba(74, 222, 128, 0); box-shadow: inset 0 0 0 rgba(74, 222, 128, 0), 0 0 0 rgba(74, 222, 128, 0); transform: translateX(-8px) scale(0.985); opacity: 0.62; }
+            36% { background: rgba(74, 222, 128, 0.1); box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.95), 0 0 30px rgba(74, 222, 128, 0.3); transform: translateX(0) scale(1.012); opacity: 1; }
+            100% { background: transparent; box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.72), 0 0 0 rgba(74, 222, 128, 0); transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes entryHighlightMoved {
+            0% { background: rgba(201, 168, 76, 0); box-shadow: inset 0 0 0 rgba(201, 168, 76, 0); transform: translateX(-10px); opacity: 0.68; }
+            38% { background: rgba(201, 168, 76, 0.09); box-shadow: inset 3px 0 0 rgba(201, 168, 76, 0.9), 0 0 24px rgba(201, 168, 76, 0.25); transform: translateX(0) scale(1.006); opacity: 1; }
+            100% { background: transparent; box-shadow: inset 3px 0 0 rgba(201, 168, 76, 0.56), 0 0 0 rgba(201, 168, 76, 0); transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes entryHighlightWarning {
+            0% { background: rgba(251, 191, 36, 0); box-shadow: inset 0 0 0 rgba(251, 191, 36, 0); transform: translateX(-10px); opacity: 0.65; }
+            38% { background: rgba(251, 191, 36, 0.11); box-shadow: inset 3px 0 0 rgba(251, 191, 36, 0.95), 0 0 26px rgba(251, 191, 36, 0.27); transform: translateX(0) scale(1.008); opacity: 1; }
+            100% { background: transparent; box-shadow: inset 3px 0 0 rgba(251, 191, 36, 0.62), 0 0 0 rgba(251, 191, 36, 0); transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes entryHighlightDanger {
+            0% { background: rgba(248, 113, 113, 0); box-shadow: inset 0 0 0 rgba(248, 113, 113, 0); transform: translateX(-12px); opacity: 0.62; }
+            38% { background: rgba(248, 113, 113, 0.1); box-shadow: inset 3px 0 0 rgba(248, 113, 113, 0.95), 0 0 28px rgba(248, 113, 113, 0.28); transform: translateX(0) scale(1.008); opacity: 1; }
+            100% { background: transparent; box-shadow: inset 3px 0 0 rgba(248, 113, 113, 0.66), 0 0 0 rgba(248, 113, 113, 0); transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes entryRemoving {
+            from { opacity: 1; transform: translateX(0) scale(1); }
+            to { opacity: 0; transform: translateX(14px) scale(0.98); filter: blur(1px); }
+        }
+
+        @keyframes destinationPulse {
+            0%, 100% { border-color: var(--border-glass); }
+            42% { border-color: var(--feedback-color, var(--primary)); box-shadow: 0 0 26px color-mix(in srgb, var(--feedback-color, var(--primary)) 24%, transparent); }
+        }
+
+        @keyframes syncSpin { to { transform: rotate(360deg); } }
+        @keyframes syncSuccess { 50% { border-color: rgba(74, 222, 128, 0.8); box-shadow: 0 0 22px rgba(74, 222, 128, 0.26); } }
+        @keyframes syncError { 25%, 75% { transform: translateX(2px); border-color: rgba(248, 113, 113, 0.8); } 50% { transform: translateX(-2px); } }
+        @keyframes badgeArrival { from { opacity: 0; transform: translateY(3px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* ===== MOTION 3.0 / CONTEXTUAL FEEDBACK ===== */
+        .entry-just-warning { animation: entryHighlightWarning 1.45s ease !important; }
+        .entry-just-danger { animation: entryHighlightDanger 1.5s ease !important; }
+
+        .entry-just-liquidated .liquidated-badge {
+            animation: badgeArrival 0.42s 0.12s both ease-out !important;
+        }
+
+        .card-has-recent-change {
+            --feedback-color: var(--primary);
+            animation: destinationPulse 1.55s ease !important;
+        }
+
+        .card-has-recent-change.feedback-success { --feedback-color: var(--success); }
+        .card-has-recent-change.feedback-warning { --feedback-color: var(--warning); }
+        .card-has-recent-change.feedback-danger { --feedback-color: var(--danger); }
+
+        .premium-tooltip {
+            position: fixed;
+            z-index: 11000;
+            max-width: 220px;
+            padding: 7px 10px;
+            border: 1px solid rgba(201, 168, 76, 0.42);
+            border-radius: 8px;
+            background: rgba(10, 10, 15, 0.96);
+            color: #f0ece6;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.42), 0 0 18px rgba(201, 168, 76, 0.1);
+            font-size: 0.66rem;
+            font-weight: 700;
+            letter-spacing: 0.25px;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(3px) scale(0.96);
+            transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+        }
+
+        .premium-tooltip.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .sync-feedback-wrap { display: inline-flex; align-items: center; gap: 8px; }
+        .sync-button { min-width: 126px; }
+        .sync-button .sync-icon { display: inline-block; margin-right: 5px; transform-origin: center; }
+        .sync-button.syncing .sync-icon { animation: syncSpin 0.72s linear infinite; }
+        .sync-button.sync-success { animation: syncSuccess 0.75s ease; }
+        .sync-button.sync-error { animation: syncError 0.38s ease; }
+
+        .updated-indicator {
+            color: var(--success);
+            font-size: 0.62rem;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateY(2px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+        .updated-indicator.visible { opacity: 1; transform: translateY(0); }
+
+        .search-highlight {
+            padding: 0 2px;
+            border-radius: 3px;
+            background: rgba(201, 168, 76, 0.24);
+            color: inherit;
+            box-shadow: inset 0 -1px 0 rgba(245, 215, 123, 0.5);
+        }
+
+        #list-container.forecast-has-open-day .day-group:not(.active) { opacity: 0.93; }
+        .day-group.active {
+            border-color: rgba(201, 168, 76, 0.5);
+            background: rgba(201, 168, 76, 0.025);
+            box-shadow: 0 10px 34px rgba(0, 0, 0, 0.22), 0 0 24px rgba(201, 168, 76, 0.1);
+        }
+
+        .day-group.active .day-header .total {
+            display: inline-block;
+            transform: scale(1.035);
+            color: #f5d77b;
+            text-shadow: 0 0 16px rgba(201, 168, 76, 0.32);
+        }
+
+        .day-group.active .day-summary strong {
+            display: inline-block;
+            transform: scale(1.035);
+            text-shadow: 0 0 16px rgba(201, 168, 76, 0.3);
+        }
+
+        .day-group.active .day-summary .received strong { color: var(--success); }
+        .day-group.active .day-summary .remaining strong { color: var(--warning); }
+
+        .forecast-peak-badge {
+            display: inline-flex;
+            margin-left: 7px;
+            padding: 3px 6px;
+            border: 1px solid rgba(201, 168, 76, 0.26);
+            border-radius: 999px;
+            background: rgba(201, 168, 76, 0.08);
+            color: var(--primary);
+            font-size: 0.48rem;
+            letter-spacing: 0.45px;
+            vertical-align: middle;
+        }
+
+        .modal-context-success { border-color: rgba(74, 222, 128, 0.34); box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55), 0 0 30px rgba(74, 222, 128, 0.09); }
+        .modal-context-success h2 { color: var(--success); }
+        .modal-context-warning { border-color: rgba(251, 191, 36, 0.34); box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55), 0 0 30px rgba(251, 191, 36, 0.09); }
+        .modal-context-warning h2 { color: var(--warning); }
+        .modal-context-danger { border-color: rgba(248, 113, 113, 0.34); box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55), 0 0 30px rgba(248, 113, 113, 0.1); }
+        .modal-context-danger h2 { color: var(--danger); }
+
+        .spotlight-card {
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .spotlight-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle 190px at var(--mouse-x) var(--mouse-y), rgba(201, 168, 76, 0.105), transparent 68%);
+            opacity: 0;
+            transition: opacity 0.24s ease;
+        }
+
+        .spotlight-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+            .spotlight-card:hover::after { opacity: 1; }
+        }
+
+        .reveal-on-scroll {
+            transition:
+                opacity 0.44s ease,
+                transform 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .reveal-on-scroll:not(.is-visible) {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .reveal-on-scroll.is-visible { opacity: 1; }
+
+        .entry-just-created,
+        .entry-just-updated {
+            animation: entryHighlightGold 1.25s ease !important;
+        }
+
+        .entry-just-liquidated {
+            animation: entryHighlightGreen 1.35s ease !important;
+        }
+
+        .entry-just-moved {
+            animation: entryHighlightMoved 1.25s ease !important;
+        }
+
+        .entry-removing {
+            pointer-events: none;
+            animation: entryRemoving 0.24s ease forwards !important;
+        }
+
         /* Responsive */
         @media (max-width: 1400px) {
             .dashboard-grid {
@@ -911,6 +1727,19 @@
 
         @media (max-width: 768px) {
             body { padding: 10px; }
+            .premium-tooltip { display: none !important; }
+            .sync-feedback-wrap { gap: 5px; }
+            .updated-indicator { font-size: 0.56rem; }
+            .forecast-peak-badge { display: block; width: max-content; margin: 4px 0 0; }
+            .ambient-background { opacity: 0.78; }
+            .ambient-grid { opacity: 0.16; background-size: 82px 82px; }
+            .ambient-orbit-1 { width: 760px; height: 760px; top: -35%; right: -105%; }
+            .ambient-ribbon-1 { width: 165vw; left: 2%; opacity: 0.76; }
+            .ambient-orbit-2,
+            .ambient-ribbon-2,
+            .ambient-beam-2,
+            .ambient-details { display: none; }
+            .ambient-beam-1 { opacity: 0.46; filter: blur(18px); }
             .header-premium { padding: 12px 16px; }
             .logo-img { height: 80px; }
             .brand h1 { font-size: 1.2rem; }
@@ -938,10 +1767,93 @@
             .header-premium { padding: 10px 12px; }
             .dashboard-grid { gap: 12px; }
             .card { padding: 12px; margin-bottom: 12px; }
+            .global-search-section { padding: 12px; }
+            .global-search-controls .btn { width: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-delay: 0ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                transition-delay: 0ms !important;
+            }
+
+            body::before,
+            body::after,
+            .ambient-background *,
+            .header-premium::before {
+                animation: none !important;
+                transform: none !important;
+                translate: none !important;
+            }
+
+            .ambient-background {
+                --ambient-far-x: 0px;
+                --ambient-far-y: 0px;
+                --ambient-mid-x: 0px;
+                --ambient-mid-y: 0px;
+                --ambient-near-x: 0px;
+                --ambient-near-y: 0px;
+            }
+
+            .ambient-beam { opacity: 0.15 !important; }
+
+            .entry-just-created,
+            .entry-just-updated,
+            .entry-just-moved {
+                animation: none !important;
+                box-shadow: inset 3px 0 0 rgba(201, 168, 76, 0.8) !important;
+                background: rgba(201, 168, 76, 0.07) !important;
+            }
+
+            .entry-just-liquidated {
+                animation: none !important;
+                box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.85) !important;
+                background: rgba(74, 222, 128, 0.07) !important;
+            }
+
+            .entry-just-warning {
+                animation: none !important;
+                box-shadow: inset 3px 0 0 rgba(251, 191, 36, 0.9) !important;
+                background: rgba(251, 191, 36, 0.07) !important;
+            }
+
+            .entry-just-danger {
+                animation: none !important;
+                box-shadow: inset 3px 0 0 rgba(248, 113, 113, 0.9) !important;
+                background: rgba(248, 113, 113, 0.07) !important;
+            }
+
+            .sync-button.syncing .sync-icon,
+            .card-has-recent-change,
+            .entry-just-liquidated .liquidated-badge {
+                animation: none !important;
+            }
         }
     </style>
 </head>
 <body data-theme="dark">
+    <div class="ambient-background" aria-hidden="true">
+        <span class="ambient-grid"></span>
+        <span class="ambient-orbit ambient-orbit-1"></span>
+        <span class="ambient-orbit ambient-orbit-2"></span>
+        <span class="ambient-ribbon ambient-ribbon-1"></span>
+        <span class="ambient-ribbon ambient-ribbon-2"></span>
+        <span class="ambient-beam ambient-beam-1"></span>
+        <span class="ambient-beam ambient-beam-2"></span>
+        <span class="ambient-details">
+            <i class="ambient-detail"></i>
+            <i class="ambient-detail"></i>
+            <i class="ambient-detail"></i>
+            <i class="ambient-detail"></i>
+            <i class="ambient-detail"></i>
+            <i class="ambient-detail"></i>
+        </span>
+    </div>
     <div class="container">
         <!-- Header -->
         <header class="header-premium">
@@ -960,7 +1872,12 @@
                     <button class="btn admin-only" id="logout-button" onclick="logoutAdmin()">Sair</button>
                 </div>
                 <button class="btn" onclick="toggleTheme()">🌓</button>
-                <button class="btn btn-primary" onclick="fetchEntries()">🔄 Sincronizar</button>
+                <span class="sync-feedback-wrap">
+                    <button class="btn btn-primary sync-button" id="sync-button" onclick="syncEntries(this)">
+                        <span class="sync-icon">🔄</span><span class="sync-label">Sincronizar</span>
+                    </button>
+                    <span class="updated-indicator" id="updated-indicator" role="status">● Atualizado agora</span>
+                </span>
                 <button class="btn" onclick="exportData()">📥 Exportar</button>
             </div>
         </header>
@@ -999,6 +1916,30 @@
             <span class="label">Total a receber</span>
             <span class="value" id="stat-total-receber">R$ 0,00</span>
         </div>
+
+        <!-- Busca Global -->
+        <section class="global-search-section" aria-label="Busca global de lançamentos">
+            <div class="global-search-controls">
+                <input
+                    type="search"
+                    id="global-search-input"
+                    class="form-control global-search-input"
+                    placeholder="🔎 Buscar seguradora, NF, observação ou valor..."
+                    aria-label="Buscar lançamentos"
+                    autocomplete="off"
+                    oninput="applyGlobalSearch()"
+                    onkeydown="handleGlobalSearchKeydown(event)"
+                >
+                <button class="btn btn-small" id="global-search-clear" type="button" onclick="clearGlobalSearch()" hidden>Limpar</button>
+            </div>
+            <div class="global-search-results" id="global-search-results" hidden>
+                <div class="global-search-header">
+                    <span class="global-search-title">Resultados da busca</span>
+                    <span class="stat-meta" id="global-search-summary"></span>
+                </div>
+                <div class="global-search-list" id="global-search-list"></div>
+            </div>
+        </section>
 
         <!-- Dashboard -->
         <div class="dashboard-grid">
@@ -1098,7 +2039,7 @@
 
     <!-- Confirmation Modal -->
     <div class="modal-overlay" id="confirm-modal">
-        <div class="modal">
+        <div class="modal modal-context-success">
             <h2>✅ Confirmar Pagamento</h2>
             <p style="color:var(--text-secondary);">Confirme os dados antes de liquidar:</p>
             <div class="details" id="modal-details"></div>
@@ -1111,7 +2052,7 @@
 
     <!-- Adiar Modal -->
     <div class="modal-overlay" id="adiar-modal">
-        <div class="modal">
+        <div class="modal modal-context-warning">
             <h2>⏰ Mover para Sem Previsão</h2>
             <p style="color:var(--text-secondary);">Este item ficará sem uma data prevista de pagamento.</p>
             <div class="details" id="adiar-details"></div>
@@ -1124,7 +2065,7 @@
 
     <!-- Marcar Inadimplente Modal -->
     <div class="modal-overlay" id="inadimplente-modal">
-        <div class="modal">
+        <div class="modal modal-context-danger">
             <h2>⚠️ Marcar como Inadimplente</h2>
             <p style="color:var(--text-secondary);">Este item será movido para a lista de inadimplentes.</p>
             <div class="details" id="inadimplente-details"></div>
@@ -1137,7 +2078,7 @@
 
     <!-- Excluir Lançamento Modal -->
     <div class="modal-overlay" id="delete-modal">
-        <div class="modal">
+        <div class="modal modal-context-danger">
             <h2 style="color:var(--danger);">🗑️ Excluir Lançamento</h2>
             <p style="color:var(--text-secondary);">Tem certeza que deseja excluir este lançamento?</p>
             <div class="details" id="delete-details"></div>
@@ -1172,6 +2113,7 @@
         </div>
     </div>
 
+    <div class="premium-tooltip" id="premium-tooltip" role="tooltip"></div>
     <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
     <script>
@@ -1194,6 +2136,14 @@
         let isAdmin = false;
         let currentUser = null;
         let isLoginSaving = false;
+        let lastChangedEntry = { id: null, type: null };
+        let lastChangedTimer = null;
+        let premiumSpotlightInitialized = false;
+        let premiumTooltipInitialized = false;
+        let activeTooltipTarget = null;
+        let updatedIndicatorTimer = null;
+        let premiumRevealObserver = null;
+        const dashboardValueAnimations = new WeakMap();
 
 
         // ===== AUTH =====
@@ -1286,6 +2236,90 @@
             setTimeout(() => toast.remove(), 4200);
         }
 
+        function showUpdatedNow() {
+            const indicator = document.getElementById('updated-indicator');
+            if (!indicator) return;
+            if (updatedIndicatorTimer) clearTimeout(updatedIndicatorTimer);
+            indicator.textContent = '● Atualizado agora';
+            indicator.classList.add('visible');
+            updatedIndicatorTimer = setTimeout(() => {
+                indicator.classList.remove('visible');
+                updatedIndicatorTimer = null;
+            }, 4000);
+        }
+
+        async function syncEntries(button = document.getElementById('sync-button')) {
+            if (!button || button.disabled) return;
+            const label = button.querySelector('.sync-label');
+            button.disabled = true;
+            button.classList.remove('sync-success', 'sync-error');
+            button.classList.add('syncing');
+            if (label) label.textContent = 'Sincronizando';
+
+            const success = await fetchEntries();
+            button.classList.remove('syncing');
+            button.classList.add(success ? 'sync-success' : 'sync-error');
+            if (label) label.textContent = 'Sincronizar';
+            button.disabled = false;
+            if (success) showUpdatedNow();
+            setTimeout(() => button.classList.remove('sync-success', 'sync-error'), 850);
+        }
+
+        function getPremiumTooltipLabel(button) {
+            const label = button.getAttribute('aria-label') || button.getAttribute('title') || '';
+            if (/liquidar/i.test(label)) return '✅ Liquidar';
+            if (/sem previs[aã]o/i.test(label)) return '⏰ Sem previsão';
+            if (/inadimplente/i.test(label)) return '⚠️ Inadimplente';
+            if (/excluir/i.test(label)) return '🗑 Excluir';
+            return '';
+        }
+
+        function positionPremiumTooltip(event) {
+            const tooltip = document.getElementById('premium-tooltip');
+            if (!tooltip || !activeTooltipTarget) return;
+            const left = Math.min(event.clientX + 14, window.innerWidth - tooltip.offsetWidth - 10);
+            const top = Math.min(event.clientY + 14, window.innerHeight - tooltip.offsetHeight - 10);
+            tooltip.style.left = `${Math.max(10, left)}px`;
+            tooltip.style.top = `${Math.max(10, top)}px`;
+        }
+
+        function hidePremiumTooltip() {
+            activeTooltipTarget = null;
+            document.getElementById('premium-tooltip')?.classList.remove('visible');
+        }
+
+        function initPremiumTooltip() {
+            const enabled = typeof window !== 'undefined' &&
+                typeof window.matchMedia === 'function' &&
+                window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            if (!enabled) return;
+
+            document.querySelectorAll('.btn-small[aria-label]').forEach(button => {
+                const label = getPremiumTooltipLabel(button);
+                if (!label) return;
+                button.dataset.tooltip = label;
+                button.removeAttribute('title');
+            });
+
+            if (premiumTooltipInitialized) return;
+            document.addEventListener('pointerover', event => {
+                const target = event.target.closest?.('[data-tooltip]');
+                if (!target) return;
+                const tooltip = document.getElementById('premium-tooltip');
+                if (!tooltip) return;
+                activeTooltipTarget = target;
+                tooltip.textContent = target.dataset.tooltip;
+                tooltip.classList.add('visible');
+                positionPremiumTooltip(event);
+            });
+            document.addEventListener('pointerout', event => {
+                if (!activeTooltipTarget || !event.target.closest?.('[data-tooltip]')) return;
+                if (event.relatedTarget && activeTooltipTarget.contains(event.relatedTarget)) return;
+                hidePremiumTooltip();
+            });
+            premiumTooltipInitialized = true;
+        }
+
         function setButtonLoading(buttonId, loading, loadingText) {
             const button = document.getElementById(buttonId);
             if (!button) return;
@@ -1299,6 +2333,229 @@
                 if (modal) modal.querySelectorAll('button').forEach(item => item.disabled = false);
                 else button.disabled = false;
                 if (button.dataset.originalText) button.innerHTML = button.dataset.originalText;
+            }
+        }
+
+        function prefersReducedMotion() {
+            return typeof window !== 'undefined' &&
+                typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        }
+
+        function parseCurrencyValue(value) {
+            const normalized = String(value || '')
+                .replace(/[^\d,.-]/g, '')
+                .replace(/\./g, '')
+                .replace(',', '.');
+            const parsed = Number(normalized);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function setDashboardValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            const targetValue = Number(value || 0);
+            if (!element || !Number.isFinite(targetValue)) return;
+
+            const running = dashboardValueAnimations.get(element);
+            if (running?.target === targetValue) return;
+            if (running && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+                window.cancelAnimationFrame(running.frameId);
+                dashboardValueAnimations.delete(element);
+            }
+
+            const storedValue = Number(element.dataset.currentValue);
+            const startValue = Number.isFinite(storedValue)
+                ? storedValue
+                : parseCurrencyValue(element.innerText);
+
+            element.classList.remove('stat-value-updated');
+            void element.offsetWidth;
+            element.classList.add('stat-value-updated');
+
+            if (
+                prefersReducedMotion() ||
+                typeof window === 'undefined' ||
+                typeof window.requestAnimationFrame !== 'function' ||
+                startValue === targetValue
+            ) {
+                element.innerText = formatCurrency(targetValue);
+                element.dataset.currentValue = String(targetValue);
+                return;
+            }
+
+            const difference = targetValue - startValue;
+            const relativeDifference = Math.min(1, Math.abs(difference) / Math.max(Math.abs(startValue), 1000));
+            const duration = 350 + (350 * relativeDifference);
+            let startedAt = null;
+
+            const step = timestamp => {
+                if (startedAt === null) startedAt = timestamp;
+                const progress = Math.min(1, (timestamp - startedAt) / duration);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const currentValue = startValue + (difference * eased);
+
+                element.innerText = formatCurrency(currentValue);
+                element.dataset.currentValue = String(currentValue);
+
+                if (progress < 1) {
+                    const frameId = window.requestAnimationFrame(step);
+                    dashboardValueAnimations.set(element, { frameId, target: targetValue });
+                    return;
+                }
+
+                element.innerText = formatCurrency(targetValue);
+                element.dataset.currentValue = String(targetValue);
+                dashboardValueAnimations.delete(element);
+            };
+
+            const frameId = window.requestAnimationFrame(step);
+            dashboardValueAnimations.set(element, { frameId, target: targetValue });
+        }
+
+        function markEntryChanged(id, type) {
+            if (lastChangedTimer) clearTimeout(lastChangedTimer);
+            lastChangedEntry = { id, type };
+            lastChangedTimer = null;
+            if (type === 'deleted') scheduleLastChangedEntryClear(700);
+        }
+
+        function scheduleLastChangedEntryClear(delay = 1700) {
+            if (lastChangedEntry.id == null || lastChangedTimer) return;
+            lastChangedTimer = setTimeout(() => {
+                document.querySelectorAll(`[data-entry-id="${lastChangedEntry.id}"]`).forEach(element => {
+                    element.classList.remove(
+                        'entry-just-created', 'entry-just-updated', 'entry-just-liquidated',
+                        'entry-just-moved', 'entry-just-warning', 'entry-just-danger'
+                    );
+                });
+                document.querySelectorAll('.card-has-recent-change').forEach(element => {
+                    element.classList.remove('card-has-recent-change', 'feedback-success', 'feedback-warning', 'feedback-danger');
+                });
+                lastChangedEntry = { id: null, type: null };
+                lastChangedTimer = null;
+            }, delay);
+        }
+
+        function getEntryMotionClass(id) {
+            if (lastChangedEntry.id == null || lastChangedEntry.id != id) return '';
+            const classes = {
+                created: 'entry-just-created',
+                updated: 'entry-just-updated',
+                liquidated: 'entry-just-liquidated',
+                moved: 'entry-just-moved',
+                sem_preview: 'entry-just-warning',
+                inadimplente: 'entry-just-danger',
+                deleted: 'entry-removing'
+            };
+            return classes[lastChangedEntry.type] || '';
+        }
+
+        function animateEntryRemoval(id) {
+            if (prefersReducedMotion() || id == null) return;
+            document.querySelectorAll('[data-entry-id]').forEach(element => {
+                if (element.dataset.entryId == id) element.classList.add('entry-removing');
+            });
+        }
+
+        function cancelEntryRemoval(id) {
+            document.querySelectorAll('[data-entry-id]').forEach(element => {
+                if (element.dataset.entryId == id) element.classList.remove('entry-removing');
+            });
+            if (lastChangedEntry.id == id && lastChangedEntry.type === 'deleted') {
+                if (lastChangedTimer) clearTimeout(lastChangedTimer);
+                lastChangedEntry = { id: null, type: null };
+                lastChangedTimer = null;
+            }
+        }
+
+        function initSpotlights() {
+            const enabled = !prefersReducedMotion() &&
+                typeof window !== 'undefined' &&
+                typeof window.matchMedia === 'function' &&
+                window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+            const cards = document.querySelectorAll('.stat-card, .day-group, .global-search-item');
+            const ambientScene = document.querySelector('.ambient-background');
+
+            cards.forEach(card => card.classList.toggle('spotlight-card', enabled));
+            if (!enabled || premiumSpotlightInitialized) return;
+
+            document.addEventListener('pointermove', event => {
+                if (prefersReducedMotion()) return;
+
+                if (ambientScene) {
+                    const normalizedX = (event.clientX / Math.max(window.innerWidth, 1)) - 0.5;
+                    const normalizedY = (event.clientY / Math.max(window.innerHeight, 1)) - 0.5;
+                    ambientScene.style.setProperty('--ambient-far-x', `${normalizedX * -8}px`);
+                    ambientScene.style.setProperty('--ambient-far-y', `${normalizedY * -8}px`);
+                    ambientScene.style.setProperty('--ambient-mid-x', `${normalizedX * -18}px`);
+                    ambientScene.style.setProperty('--ambient-mid-y', `${normalizedY * -18}px`);
+                    ambientScene.style.setProperty('--ambient-near-x', `${normalizedX * -28}px`);
+                    ambientScene.style.setProperty('--ambient-near-y', `${normalizedY * -28}px`);
+                }
+
+                if (activeTooltipTarget) positionPremiumTooltip(event);
+
+                const card = event.target.closest?.('.spotlight-card');
+                if (!card) return;
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mouse-x', `${event.clientX - rect.left}px`);
+                card.style.setProperty('--mouse-y', `${event.clientY - rect.top}px`);
+            }, { passive: true });
+
+            premiumSpotlightInitialized = true;
+        }
+
+        function initRevealObserver() {
+            const elementsToReveal = document.querySelectorAll('.stat-card, .card, .day-group, .global-search-item');
+
+            if (prefersReducedMotion() || typeof IntersectionObserver === 'undefined') {
+                premiumRevealObserver?.disconnect();
+                elementsToReveal.forEach(element => element.classList.add('is-visible'));
+                return;
+            }
+
+            if (!premiumRevealObserver) {
+                premiumRevealObserver = new IntersectionObserver(items => {
+                    items.forEach(item => {
+                        if (!item.isIntersecting) return;
+                        item.target.classList.add('is-visible');
+                        premiumRevealObserver?.unobserve(item.target);
+                    });
+                }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+            } else {
+                premiumRevealObserver.disconnect();
+            }
+
+            elementsToReveal.forEach(element => {
+                element.classList.add('reveal-on-scroll');
+                if (!element.classList.contains('is-visible')) premiumRevealObserver.observe(element);
+            });
+        }
+
+        function initPremiumInteractions() {
+            try {
+                initSpotlights();
+                initPremiumTooltip();
+                initRevealObserver();
+                if (lastChangedEntry.id != null && lastChangedEntry.type !== 'deleted') {
+                    const changedElements = Array.from(document.querySelectorAll('[data-entry-id]'))
+                        .filter(element => element.dataset.entryId == lastChangedEntry.id);
+                    const feedbackClass = {
+                        liquidated: 'feedback-success',
+                        sem_preview: 'feedback-warning',
+                        inadimplente: 'feedback-danger'
+                    }[lastChangedEntry.type];
+                    changedElements.forEach(element => {
+                        const destination = element.closest('.card, .day-group');
+                        if (!destination) return;
+                        destination.classList.add('card-has-recent-change');
+                        if (feedbackClass) destination.classList.add(feedbackClass);
+                    });
+                    const changedEntryRendered = changedElements.length > 0;
+                    if (changedEntryRendered) scheduleLastChangedEntryClear();
+                }
+            } catch (error) {
+                console.warn('Interações visuais premium indisponíveis:', error);
             }
         }
 
@@ -1453,6 +2710,148 @@
             updateStats(entries);
         }
 
+        // ===== GLOBAL SEARCH =====
+        function normalizeSearchText(value) {
+            return String(value || '').trim().toLowerCase();
+        }
+
+        function escapeRegExp(value) {
+            return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function highlightSearchTerm(text, query) {
+            const source = String(text ?? '');
+            const term = String(query || '').trim();
+            if (!term) return escapeHtml(source);
+
+            const expression = new RegExp(escapeRegExp(term), 'gi');
+            let output = '';
+            let cursor = 0;
+            let match;
+            while ((match = expression.exec(source)) !== null) {
+                output += escapeHtml(source.slice(cursor, match.index));
+                output += `<mark class="search-highlight">${escapeHtml(match[0])}</mark>`;
+                cursor = match.index + match[0].length;
+            }
+            return output + escapeHtml(source.slice(cursor));
+        }
+
+        function renderGlobalSearchActions(entry, status) {
+            if (!isAdmin) return '';
+
+            if (status === 'liquidado') {
+                return `
+                    <div class="status-item-actions">
+                        <button class="btn btn-danger btn-small" onclick="openDeleteModal(${entry.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
+                    </div>`;
+            }
+
+            const semPrevisaoAction = status === 'pendente'
+                ? `<button class="btn btn-warning btn-small" onclick="openAdiarModal(${entry.id})" title="Mover para Sem Previsão" aria-label="Mover para Sem Previsão">⏰</button>`
+                : '';
+            const inadimplenteAction = status === 'pendente' || status === 'sem_previsao'
+                ? `<button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${entry.id})" title="Marcar como Inadimplente" aria-label="Marcar como Inadimplente">⚠️</button>`
+                : '';
+
+            return `
+                <div class="status-item-actions">
+                    <button class="btn btn-small" onclick="editEntry(${entry.id})" title="Editar lançamento">Editar</button>
+                    <button class="btn btn-success btn-small" onclick="openConfirmModal(${entry.id})" title="Liquidar" aria-label="Liquidar lançamento">✅</button>
+                    ${semPrevisaoAction}
+                    ${inadimplenteAction}
+                    <button class="btn btn-danger btn-small" onclick="openDeleteModal(${entry.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
+                </div>`;
+        }
+
+        function renderGlobalSearchResults(results, query = '') {
+            const container = document.getElementById('global-search-list');
+            const summary = document.getElementById('global-search-summary');
+            const hojeStr = getTodayString();
+
+            container.innerHTML = '';
+            summary.innerText = `${results.length} lançamento${results.length === 1 ? '' : 's'} encontrado${results.length === 1 ? '' : 's'}`;
+
+            if (results.length === 0) {
+                container.innerHTML = `<div class="empty-state"><p>Nenhum lançamento encontrado.</p></div>`;
+                return;
+            }
+
+            results.forEach(entry => {
+                const status = getEntryStatus(entry);
+                const overdue = isOverdue(entry, hojeStr);
+                const statusClass = overdue
+                    ? 'atrasado'
+                    : ({ liquidado: 'liquidado', inadimplente: 'inadimplente', sem_previsao: 'sem-previsao' }[status] || 'pendente');
+                const div = document.createElement('div');
+                div.className = `global-search-item ${getEntryMotionClass(entry.id)}`;
+                div.dataset.entryId = entry.id;
+                div.innerHTML = `
+                    <div class="global-search-item-main">
+                        <div class="global-search-item-info">
+                            <strong>${highlightSearchTerm(entry.seguradora || 'Sem seguradora', query)}</strong>
+                            <span>${highlightSearchTerm(entry.desc || 'Sem observação', query)}</span>
+                        </div>
+                        <span class="global-search-value">${highlightSearchTerm(formatCurrency(entry.value), query)}</span>
+                    </div>
+                    <div class="global-search-meta">
+                        <span class="global-search-status ${statusClass}">Status: ${formatStatusLabel(entry)}</span>
+                        ${entry.date ? `<span>Previsto: ${formatDateBR(entry.date)}</span>` : ''}
+                        ${status === 'liquidado' && entry.paid_at ? `<span>Pago: ${formatDateBR(entry.paid_at)}</span>` : ''}
+                        ${overdue ? `<span style="color:var(--danger);font-weight:700;">${getOverdueDays(entry.date, hojeStr)} dia${getOverdueDays(entry.date, hojeStr) === 1 ? '' : 's'} de atraso</span>` : ''}
+                    </div>
+                    ${renderGlobalSearchActions(entry, status)}
+                `;
+                container.appendChild(div);
+            });
+
+            initPremiumInteractions();
+        }
+
+        function applyGlobalSearch() {
+            const input = document.getElementById('global-search-input');
+            const resultsArea = document.getElementById('global-search-results');
+            const clearButton = document.getElementById('global-search-clear');
+            const rawQuery = input.value.trim();
+            const query = normalizeSearchText(rawQuery);
+            const active = query.length > 0;
+
+            resultsArea.hidden = !active;
+            clearButton.hidden = !active;
+
+            if (!active) {
+                document.getElementById('global-search-list').innerHTML = '';
+                document.getElementById('global-search-summary').innerText = '';
+                return;
+            }
+
+            const valueQuery = /^[\d\s.,r$]+$/i.test(rawQuery) ? rawQuery.replace(/\D/g, '') : '';
+            const results = entries.filter(entry => {
+                const text = normalizeSearchText(`${entry.seguradora || ''} ${entry.desc || ''}`);
+                const formattedValue = normalizeSearchText(formatCurrency(entry.value));
+                const numericValue = formattedValue.replace(/\D/g, '');
+                const matchesText = text.includes(query);
+                const matchesValue = !!valueQuery && (
+                    formattedValue.includes(query) || numericValue.includes(valueQuery)
+                );
+                return matchesText || matchesValue;
+            });
+
+            renderGlobalSearchResults(results, rawQuery);
+        }
+
+        function clearGlobalSearch() {
+            const input = document.getElementById('global-search-input');
+            input.value = '';
+            applyGlobalSearch();
+            input.focus();
+        }
+
+        function handleGlobalSearchKeydown(event) {
+            if (event.key !== 'Escape') return;
+            event.preventDefault();
+            clearGlobalSearch();
+        }
+
         // ===== RENDER =====
         function render() {
             const hojeStr = getTodayString();
@@ -1491,20 +2890,38 @@
             renderInadimplentes(inadimplentes);
             renderPendentes(overduePending, hojeStr);
             updateStats(entries);
+            applyGlobalSearch();
+            initPremiumInteractions();
         }
 
         function renderFeed(groups, hojeStr) {
             const container = document.getElementById('list-container');
             container.innerHTML = '';
+            const sortedDates = Object.keys(groups).sort();
+            const highestFutureDate = sortedDates
+                .filter(date => date > hojeStr)
+                .reduce((bestDate, date) => {
+                    const total = groups[date].reduce((sum, entry) => sum + Number(entry.value || 0), 0);
+                    const bestTotal = bestDate
+                        ? groups[bestDate].reduce((sum, entry) => sum + Number(entry.value || 0), 0)
+                        : -1;
+                    return total > bestTotal ? date : bestDate;
+                }, null);
 
-            if (Object.keys(groups).length === 0) {
+            container.classList.toggle(
+                'forecast-has-open-day',
+                sortedDates.some(date => !!openDays[date])
+            );
+
+            if (sortedDates.length === 0) {
                 container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Nenhum lançamento previsto</p></div>`;
                 return;
             }
 
-            Object.keys(groups).sort().forEach(date => {
+            sortedDates.forEach(date => {
                 const dayEntries = groups[date];
                 const isToday = date === hojeStr;
+                const isHighestForecast = date === highestFutureDate;
                 const isOverdueDay = dayEntries.some(entry => isOverdue(entry, hojeStr));
                 const previstoDia = dayEntries.reduce((s, x) => s + Number(x.value || 0), 0);
                 const recebidoDia = isToday
@@ -1515,7 +2932,7 @@
                     : previstoDia;
 
                 const div = document.createElement('div');
-                div.className = `day-group ${openDays[date] ? 'active' : ''} ${isToday ? 'today' : ''} ${isOverdueDay ? 'overdue' : ''}`;
+                div.className = `day-group ${openDays[date] ? 'active' : ''} ${isToday ? 'today' : ''} ${isOverdueDay ? 'overdue' : ''} ${isHighestForecast ? 'highest-forecast' : ''}`;
 
                 let dateLabel = date.split('-').reverse().slice(0,2).join('/');
                 if (isToday) dateLabel += ' 🔴 HOJE';
@@ -1535,15 +2952,16 @@
 
                 div.innerHTML = `
                     <div class="day-header" onclick="toggleDay('${date}')">
-                        <span class="date">📅 ${dateLabel}</span>
+                        <span class="date">📅 ${dateLabel}${isHighestForecast ? '<span class="forecast-peak-badge">★ MAIOR PREVISÃO</span>' : ''}</span>
                         ${headerValue}
                     </div>
                     <div class="day-content">
+                        <div class="day-content-inner">
                         ${dayEntries.map(e => {
                             const status = getEntryStatus(e);
                             const isLiquidatedToday = isToday && status === 'liquidado';
                             return `
-                            <div class="entry-row ${isLiquidatedToday ? 'liquidated-today' : ''}">
+                            <div class="entry-row ${isLiquidatedToday ? 'liquidated-today' : ''} ${getEntryMotionClass(e.id)}" data-entry-id="${e.id}">
                                 <div class="entry-info">
                                     <span class="main">${e.seguradora}</span>
                                     <span class="sub">${e.desc || 'Sem obs'}</span>
@@ -1554,10 +2972,10 @@
                                 <div class="entry-value">${formatCurrency(e.value)}</div>
                                 ${(!isLiquidatedToday && isAdmin) ? `
                                     <div class="entry-actions">
-                                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
-                                        <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
-                                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                                        <button class="btn btn-small" onclick="editEntry(${e.id})" title="Editar lançamento">Editar</button>
+                                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})" title="Liquidar" aria-label="Liquidar lançamento">✅</button>
+                                        <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})" title="Mover para Sem Previsão" aria-label="Mover para Sem Previsão">⏰</button>
+                                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})" title="Marcar como Inadimplente" aria-label="Marcar como Inadimplente">⚠️</button>
                                         <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
                                     </div>` : ''}
                             </div>`;
@@ -1567,10 +2985,13 @@
                                 🟢 Liquidado &nbsp;•&nbsp; Pendentes: Confirmar ✅ | Sem previsão ⏰ | Inadimplente ⚠️
                             </div>
                         ` : ''}
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
             });
+
+            initPremiumInteractions();
         }
 
         function renderHistory(historyItems) {
@@ -1584,7 +3005,8 @@
 
             historyItems.sort((a,b) => (b.paid_at || b.date || '').localeCompare(a.paid_at || a.date || '')).slice(0, 20).forEach(e => {
                 const div = document.createElement('div');
-                div.className = 'history-item';
+                div.className = `history-item ${getEntryMotionClass(e.id)}`;
+                div.dataset.entryId = e.id;
                 div.innerHTML = `
                     <div class="info">
                         <span>${escapeHtml(e.seguradora)}</span>
@@ -1611,15 +3033,16 @@
 
             noPreview.forEach(e => {
                 const div = document.createElement('div');
-                div.className = 'status-item';
+                div.className = `status-item ${getEntryMotionClass(e.id)}`;
+                div.dataset.entryId = e.id;
                 div.innerHTML = `
                     <div class="status-item-info">${escapeHtml(e.seguradora)} ${e.desc ? '- ' + escapeHtml(e.desc) : ''}</div>
                     <div class="status-item-side">
                         <span class="status-item-value" style="color:var(--primary);">${formatCurrency(e.value)}</span>
                         ${isAdmin ? `<div class="status-item-actions">
-                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
-                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                        <button class="btn btn-small" onclick="editEntry(${e.id})" title="Editar lançamento">Editar</button>
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})" title="Liquidar" aria-label="Liquidar lançamento">✅</button>
+                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})" title="Marcar como Inadimplente" aria-label="Marcar como Inadimplente">⚠️</button>
                         <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
                         </div>` : ''}
                     </div>
@@ -1640,14 +3063,15 @@
 
             inadimplentes.forEach(e => {
                 const div = document.createElement('div');
-                div.className = 'status-item';
+                div.className = `status-item ${getEntryMotionClass(e.id)}`;
+                div.dataset.entryId = e.id;
                 div.innerHTML = `
                     <div class="status-item-info">${escapeHtml(e.seguradora)} ${e.desc ? '- ' + escapeHtml(e.desc) : ''}</div>
                     <div class="status-item-side">
                         <span class="status-item-value" style="color:var(--danger);">${formatCurrency(e.value)}</span>
                         ${isAdmin ? `<div class="status-item-actions">
-                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
+                        <button class="btn btn-small" onclick="editEntry(${e.id})" title="Editar lançamento">Editar</button>
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})" title="Liquidar" aria-label="Liquidar lançamento">✅</button>
                         <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
                         </div>` : ''}
                     </div>
@@ -1669,7 +3093,8 @@
             [...pendentes].sort((a, b) => (a.date || '').localeCompare(b.date || '')).forEach(e => {
                 const overdueDays = getOverdueDays(e.date, hojeStr);
                 const div = document.createElement('div');
-                div.className = 'status-item';
+                div.className = `status-item ${getEntryMotionClass(e.id)}`;
+                div.dataset.entryId = e.id;
                 div.innerHTML = `
                     <div class="status-item-info">
                         <strong>${escapeHtml(e.seguradora)}</strong>
@@ -1679,10 +3104,10 @@
                     <div class="status-item-side">
                         <span class="status-item-value" style="color:var(--danger);">${formatCurrency(e.value)}</span>
                         ${isAdmin ? `<div class="status-item-actions">
-                        <button class="btn btn-small" onclick="editEntry(${e.id})">Editar</button>
-                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})">✅</button>
-                        <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})">⏰</button>
-                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})">⚠️</button>
+                        <button class="btn btn-small" onclick="editEntry(${e.id})" title="Editar lançamento">Editar</button>
+                        <button class="btn btn-success btn-small" onclick="openConfirmModal(${e.id})" title="Liquidar" aria-label="Liquidar lançamento">✅</button>
+                        <button class="btn btn-warning btn-small" onclick="openAdiarModal(${e.id})" title="Mover para Sem Previsão" aria-label="Mover para Sem Previsão">⏰</button>
+                        <button class="btn btn-danger btn-small" onclick="openInadimplenteModal(${e.id})" title="Marcar como Inadimplente" aria-label="Marcar como Inadimplente">⚠️</button>
                         <button class="btn btn-danger btn-small" onclick="openDeleteModal(${e.id})" title="Excluir lançamento" aria-label="Excluir lançamento">🗑️</button>
                         </div>` : ''}
                     </div>
@@ -1723,16 +3148,16 @@
                 if (status === 'liquidado' && (entry.paid_at || entry.date || '').slice(0, 7) === currentMonth) totals.liquidadoMes += value;
             });
 
-            document.getElementById('stat-hoje').innerText = formatCurrency(totals.hoje);
-            document.getElementById('stat-proximos').innerText = formatCurrency(totals.proximos);
-            document.getElementById('stat-atrasados').innerText = formatCurrency(totals.atrasados);
+            setDashboardValue('stat-hoje', totals.hoje);
+            setDashboardValue('stat-proximos', totals.proximos);
+            setDashboardValue('stat-atrasados', totals.atrasados);
             document.getElementById('stat-atrasados-count').innerText = `${totals.atrasadosCount} lançamento${totals.atrasadosCount === 1 ? '' : 's'}`;
-            document.getElementById('stat-sem-previsao').innerText = formatCurrency(totals.semPrevisao);
+            setDashboardValue('stat-sem-previsao', totals.semPrevisao);
             document.getElementById('stat-sem-previsao-count').innerText = `${totals.semPrevisaoCount} lançamento${totals.semPrevisaoCount === 1 ? '' : 's'}`;
-            document.getElementById('stat-inadimplentes').innerText = formatCurrency(totals.inadimplentes);
+            setDashboardValue('stat-inadimplentes', totals.inadimplentes);
             document.getElementById('stat-inadimplentes-count').innerText = `${totals.inadimplentesCount} lançamento${totals.inadimplentesCount === 1 ? '' : 's'}`;
-            document.getElementById('stat-liquidado-mes').innerText = formatCurrency(totals.liquidadoMes);
-            document.getElementById('stat-total-receber').innerText = formatCurrency(totals.totalReceber);
+            setDashboardValue('stat-liquidado-mes', totals.liquidadoMes);
+            setDashboardValue('stat-total-receber', totals.totalReceber);
         }
 
         // ===== TOGGLE =====
@@ -1744,6 +3169,7 @@
         // ===== CONFIRM PAYMENT =====
         function openConfirmModal(id) {
             if (!requireAdmin()) return;
+            hidePremiumTooltip();
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             confirmEntryId = id;
@@ -1792,9 +3218,10 @@
                     return;
                 }
 
+                markEntryChanged(confirmEntryId, 'liquidated');
                 closeModal();
                 showToast('Pagamento confirmado.');
-                await fetchEntries();
+                if (await fetchEntries()) showUpdatedNow();
             } catch (error) {
                 console.error(error);
                 showToast('Não foi possível confirmar o pagamento.', 'error');
@@ -1807,6 +3234,7 @@
         // ===== ADIAR =====
         function openAdiarModal(id) {
             if (!requireAdmin()) return;
+            hidePremiumTooltip();
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             adiarEntryId = id;
@@ -1840,9 +3268,10 @@
                     return;
                 }
 
+                markEntryChanged(adiarEntryId, 'sem_preview');
                 closeAdiarModal();
                 showToast('Movido para Sem Previsão.');
-                await fetchEntries();
+                if (await fetchEntries()) showUpdatedNow();
             } catch (error) {
                 console.error(error);
                 showToast('Não foi possível mover para Sem Previsão.', 'error');
@@ -1855,6 +3284,7 @@
         // ===== INADIMPLENTE =====
         function openInadimplenteModal(id) {
             if (!requireAdmin()) return;
+            hidePremiumTooltip();
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
             inadimplenteEntryId = id;
@@ -1888,9 +3318,10 @@
                     return;
                 }
 
+                markEntryChanged(inadimplenteEntryId, 'inadimplente');
                 closeInadimplenteModal();
                 showToast('Marcado como inadimplente.');
-                await fetchEntries();
+                if (await fetchEntries()) showUpdatedNow();
             } catch (error) {
                 console.error(error);
                 showToast('Não foi possível marcar como inadimplente.', 'error');
@@ -1903,6 +3334,7 @@
         // ===== DELETE =====
         function openDeleteModal(id) {
             if (!requireAdmin()) return;
+            hidePremiumTooltip();
             const entry = entries.find(e => e.id == id);
             if (!entry) return;
 
@@ -1933,16 +3365,20 @@
                 return;
             }
 
+            const entryIdToDelete = deleteEntryId;
+            markEntryChanged(entryIdToDelete, 'deleted');
+            animateEntryRemoval(entryIdToDelete);
             isDeleteSaving = true;
             setButtonLoading('confirm-delete-button', true, 'Excluindo...');
             try {
                 const { error } = await _supabase
                     .from('entries')
                     .delete()
-                    .eq('id', deleteEntryId);
+                    .eq('id', entryIdToDelete);
 
                 if (error) {
                     console.error('Erro ao excluir lançamento:', error);
+                    cancelEntryRemoval(entryIdToDelete);
                     showToast('Não foi possível excluir o lançamento.', 'error');
                     return;
                 }
@@ -1952,6 +3388,7 @@
                 await fetchEntries();
             } catch (error) {
                 console.error('Erro ao excluir lançamento:', error);
+                cancelEntryRemoval(entryIdToDelete);
                 showToast('Não foi possível excluir o lançamento.', 'error');
             } finally {
                 isDeleteSaving = false;
@@ -2035,6 +3472,13 @@
             };
 
             const id = document.getElementById('edit-id').value;
+            const existingEntry = id ? entries.find(entry => entry.id == id) : null;
+            const changedClassification = existingEntry && getEntryStatus(existingEntry) !== status;
+            const changeType = changedClassification && status === 'sem_previsao'
+                ? 'sem_preview'
+                : changedClassification && status === 'inadimplente'
+                    ? 'inadimplente'
+                    : (existingEntry && ((existingEntry.date || null) !== date || changedClassification) ? 'moved' : 'updated');
             isFormSaving = true;
             setButtonLoading('save-entry-button', true, 'Salvando...');
             try {
@@ -2050,12 +3494,13 @@
                     return;
                 }
 
+                if (id) markEntryChanged(id, changeType);
                 document.getElementById('entry-form').reset();
                 document.getElementById('edit-id').value = '';
                 document.getElementById('input-date').disabled = false;
                 document.getElementById('input-date').style.opacity = '1';
                 showToast(id ? 'Lançamento atualizado com sucesso.' : 'Lançamento salvo com sucesso.');
-                await fetchEntries();
+                if (await fetchEntries()) showUpdatedNow();
             } catch (error) {
                 console.error(error);
                 showToast('Não foi possível salvar o lançamento.', 'error');
