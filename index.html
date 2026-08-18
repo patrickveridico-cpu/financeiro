@@ -212,12 +212,16 @@
 
         .ambient-beam-1 {
             left: -66vw;
+            opacity: 0.16;
+            transform: translate3d(76vw, 0, 0) rotate(18deg);
             animation: ambientBeamOne 10s cubic-bezier(0.45, 0, 0.22, 1) -2s infinite;
         }
 
         .ambient-beam-2 {
             right: -64vw;
             width: max(22vw, 340px);
+            opacity: 0.12;
+            transform: translate3d(-74vw, 0, 0) rotate(-21deg);
             animation: ambientBeamTwo 12s cubic-bezier(0.45, 0, 0.22, 1) -6s infinite;
         }
 
@@ -367,7 +371,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, filter 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
             background: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border-glass);
@@ -587,7 +591,7 @@
             border: 1px solid var(--border-glass);
             border-radius: 16px;
             padding: 16px 20px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             position: relative;
             overflow: hidden;
         }
@@ -656,7 +660,7 @@
             border: 1px solid var(--border-glass);
             border-radius: 16px;
             padding: 20px;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
             margin-bottom: 16px;
         }
 
@@ -708,7 +712,7 @@
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             font-size: 0.85rem;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
         }
 
         .form-control:focus {
@@ -749,7 +753,7 @@
             border: 1px solid var(--border-glass);
             border-radius: 12px;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
         }
 
         .day-group:hover {
@@ -773,7 +777,7 @@
             padding: 12px 16px;
             background: var(--bg-primary);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease;
             user-select: none;
         }
 
@@ -976,7 +980,7 @@
             color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             font-size: 0.75rem;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
         }
 
         .filter-input:focus {
@@ -1698,6 +1702,143 @@
             animation: entryRemoving 0.24s ease forwards !important;
         }
 
+        /* ===== PERFORMANCE PASS 1.0 / MOTION PROFILES ===== */
+        @keyframes statValuePulseLite {
+            from { opacity: 0.72; }
+            to { opacity: 1; }
+        }
+
+        body.motion-lite .ambient-grid,
+        body.motion-lite .ambient-orbit-2,
+        body.motion-lite .ambient-ribbon-2,
+        body.motion-lite .ambient-beam-2,
+        body.motion-lite .ambient-details {
+            display: none !important;
+        }
+
+        body.motion-lite .ambient-background {
+            opacity: 0.72;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(201, 168, 76, 0.13), transparent 31%),
+                radial-gradient(circle at 88% 76%, rgba(134, 83, 30, 0.1), transparent 35%);
+        }
+
+        body.motion-lite .ambient-orbit-1,
+        body.motion-lite .ambient-ribbon-1,
+        body.motion-lite .ambient-beam-1 {
+            will-change: auto;
+        }
+
+        body.motion-lite .ambient-beam-1 {
+            filter: none;
+            opacity: 0.2;
+        }
+
+        body.motion-lite .header-premium {
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            background: rgba(18, 18, 26, 0.96);
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.24);
+        }
+
+        body[data-theme="light"].motion-lite .header-premium,
+        body[data-theme="light"].motion-lite .stat-card,
+        body[data-theme="light"].motion-lite .card {
+            background: rgba(255, 255, 255, 0.97);
+        }
+
+        body.motion-lite .btn,
+        body.motion-lite .stat-card,
+        body.motion-lite .card {
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.motion-lite .stat-card,
+        body.motion-lite .card {
+            background: rgba(18, 18, 26, 0.96);
+            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
+        }
+
+        body.motion-lite .modal-overlay {
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+
+        body.motion-lite .modal {
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42);
+        }
+
+        body.motion-lite .header-premium::before,
+        body.motion-lite .day-group.today {
+            animation: none !important;
+            will-change: auto;
+        }
+
+        body.motion-lite .logo-img {
+            filter: drop-shadow(0 2px 10px rgba(201, 168, 76, 0.24));
+        }
+
+        body.motion-lite .reveal-on-scroll,
+        body.motion-lite .reveal-on-scroll:not(.is-visible) {
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
+        body.motion-lite .day-group.active .entry-row,
+        body.motion-lite .day-group.active .entry-row.liquidated-today,
+        body.motion-lite .day-group.active .liquidated-badge,
+        body.motion-lite .global-search-results:not([hidden]),
+        body.motion-lite .global-search-item {
+            animation: none;
+            animation-delay: 0ms;
+        }
+
+        body.motion-lite .stat-value-updated {
+            animation: statValuePulseLite 0.22s ease both;
+        }
+
+        body.motion-lite .entry-just-created,
+        body.motion-lite .entry-just-updated,
+        body.motion-lite .entry-just-moved {
+            animation: none !important;
+            background: rgba(201, 168, 76, 0.065) !important;
+            box-shadow: inset 3px 0 0 rgba(201, 168, 76, 0.72) !important;
+        }
+
+        body.motion-lite .entry-just-liquidated {
+            animation: none !important;
+            background: rgba(74, 222, 128, 0.065) !important;
+            box-shadow: inset 3px 0 0 rgba(74, 222, 128, 0.76) !important;
+        }
+
+        body.motion-lite .entry-just-warning {
+            animation: none !important;
+            background: rgba(251, 191, 36, 0.065) !important;
+            box-shadow: inset 3px 0 0 rgba(251, 191, 36, 0.78) !important;
+        }
+
+        body.motion-lite .entry-just-danger {
+            animation: none !important;
+            background: rgba(248, 113, 113, 0.065) !important;
+            box-shadow: inset 3px 0 0 rgba(248, 113, 113, 0.78) !important;
+        }
+
+        body.page-hidden .ambient-background *,
+        body.page-hidden .header-premium::before,
+        body.page-hidden .day-group.today {
+            animation-play-state: paused !important;
+        }
+
+        body.motion-no-independent-translate .ambient-grid,
+        body.motion-no-independent-translate .ambient-orbit,
+        body.motion-no-independent-translate .ambient-ribbon,
+        body.motion-no-independent-translate .ambient-beam {
+            translate: none;
+        }
+
         /* Responsive */
         @media (max-width: 1400px) {
             .dashboard-grid {
@@ -1801,6 +1942,14 @@
             }
 
             .ambient-beam { opacity: 0.15 !important; }
+            .ambient-beam-1 {
+                display: block !important;
+                left: 24% !important;
+                right: auto !important;
+                transform: rotate(18deg) !important;
+                filter: none !important;
+            }
+            .ambient-beam-2 { display: none !important; }
 
             .entry-just-created,
             .entry-just-updated,
@@ -2142,6 +2291,8 @@
         let premiumTooltipInitialized = false;
         let activeTooltipTarget = null;
         let updatedIndicatorTimer = null;
+        let motionProfileInitialized = false;
+        let motionProfileQueries = null;
         let premiumRevealObserver = null;
         const dashboardValueAnimations = new WeakMap();
 
@@ -2342,6 +2493,64 @@
                 window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         }
 
+        function detectMotionProfile() {
+            if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
+            const queries = motionProfileQueries || {
+                small: window.matchMedia('(max-width: 768px)'),
+                hoverNone: window.matchMedia('(hover: none)'),
+                coarse: window.matchMedia('(pointer: coarse)'),
+                fine: window.matchMedia('(pointer: fine)')
+            };
+            return queries.small.matches || ((queries.hoverNone.matches || queries.coarse.matches) && !queries.fine.matches);
+        }
+
+        function applyMotionProfile() {
+            const motionLite = detectMotionProfile();
+            document.body.classList.toggle('motion-lite', motionLite);
+
+            const supportsIndependentTranslate = typeof CSS !== 'undefined' &&
+                typeof CSS.supports === 'function' &&
+                CSS.supports('translate', '1px');
+            document.body.classList.toggle('motion-no-independent-translate', !supportsIndependentTranslate);
+
+            if (!motionLite) return;
+            document.querySelectorAll('.spotlight-card').forEach(card => card.classList.remove('spotlight-card'));
+            premiumRevealObserver?.disconnect();
+            document.querySelectorAll('.reveal-on-scroll').forEach(element => element.classList.add('is-visible'));
+
+            const ambientScene = document.querySelector('.ambient-background');
+            ['--ambient-far-x', '--ambient-far-y', '--ambient-mid-x', '--ambient-mid-y', '--ambient-near-x', '--ambient-near-y']
+                .forEach(property => ambientScene?.style.setProperty(property, '0px'));
+        }
+
+        function initPageVisibilityMotion() {
+            const updateVisibility = () => document.body.classList.toggle('page-hidden', document.hidden);
+            updateVisibility();
+            document.addEventListener('visibilitychange', updateVisibility, { passive: true });
+        }
+
+        function initMotionPerformance() {
+            if (motionProfileInitialized || typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+            motionProfileQueries = {
+                small: window.matchMedia('(max-width: 768px)'),
+                hoverNone: window.matchMedia('(hover: none)'),
+                coarse: window.matchMedia('(pointer: coarse)'),
+                fine: window.matchMedia('(pointer: fine)')
+            };
+
+            const handleProfileChange = () => {
+                applyMotionProfile();
+                initPremiumInteractions();
+            };
+            Object.values(motionProfileQueries).forEach(query => {
+                if (typeof query.addEventListener === 'function') query.addEventListener('change', handleProfileChange);
+                else if (typeof query.addListener === 'function') query.addListener(handleProfileChange);
+            });
+            applyMotionProfile();
+            initPageVisibilityMotion();
+            motionProfileInitialized = true;
+        }
+
         function parseCurrencyValue(value) {
             const normalized = String(value || '')
                 .replace(/[^\d,.-]/g, '')
@@ -2374,6 +2583,7 @@
 
             if (
                 prefersReducedMotion() ||
+                document.body.classList.contains('motion-lite') ||
                 typeof window === 'undefined' ||
                 typeof window.requestAnimationFrame !== 'function' ||
                 startValue === targetValue
@@ -2469,7 +2679,8 @@
         }
 
         function initSpotlights() {
-            const enabled = !prefersReducedMotion() &&
+            const enabled = !document.body.classList.contains('motion-lite') &&
+                !prefersReducedMotion() &&
                 typeof window !== 'undefined' &&
                 typeof window.matchMedia === 'function' &&
                 window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -2480,7 +2691,7 @@
             if (!enabled || premiumSpotlightInitialized) return;
 
             document.addEventListener('pointermove', event => {
-                if (prefersReducedMotion()) return;
+                if (prefersReducedMotion() || document.body.classList.contains('motion-lite')) return;
 
                 if (ambientScene) {
                     const normalizedX = (event.clientX / Math.max(window.innerWidth, 1)) - 0.5;
@@ -2508,7 +2719,7 @@
         function initRevealObserver() {
             const elementsToReveal = document.querySelectorAll('.stat-card, .card, .day-group, .global-search-item');
 
-            if (prefersReducedMotion() || typeof IntersectionObserver === 'undefined') {
+            if (document.body.classList.contains('motion-lite') || prefersReducedMotion() || typeof IntersectionObserver === 'undefined') {
                 premiumRevealObserver?.disconnect();
                 elementsToReveal.forEach(element => element.classList.add('is-visible'));
                 return;
@@ -2625,17 +2836,17 @@
             return labels[getEntryStatus(entry)] || 'Pendente';
         }
 
-        // Compatibilidade com dados legados do sistema antigo:
-        // - registros NOVOS possuem status explícito e seguem a nova lógica;
-        // - registros ANTIGOS sem status e com data passada eram considerados históricos
-        //   pelo sistema original, portanto continuam como liquidados apenas para exibição;
-        // - registros sem status com data de hoje/futura permanecem pendentes.
+        // Compatibilidade segura com dados legados:
+        // - status explícito sempre prevalece;
+        // - paid_at sem status preserva liquidações comprovadas;
+        // - data prevista, inclusive vencida, nunca implica liquidação.
         function getEntryStatus(entry) {
             const validStatuses = ['pendente', 'sem_previsao', 'inadimplente', 'liquidado'];
             if (validStatuses.includes(entry.status)) return entry.status;
 
+            if (entry.paid_at) return 'liquidado';
             if (!entry.date) return 'sem_previsao';
-            return entry.date < getTodayString() ? 'liquidado' : 'pendente';
+            return 'pendente';
         }
 
         function isOverdue(entry, hojeStr) {
@@ -2876,7 +3087,7 @@
                     inadimplentes.push(e);
                 } else if (status === 'sem_previsao') {
                     noPreview.push(e);
-                } else if (isOverdue(e, hojeStr)) {
+                } else if (status === 'pendente' && isOverdue(e, hojeStr)) {
                     overduePending.push(e);
                 } else if (status === 'pendente' && e.date) {
                     groups[e.date] = groups[e.date] || [];
@@ -3568,6 +3779,7 @@
         }
 
         // ===== INIT =====
+        initMotionPerformance();
         initAuth();
         fetchEntries();
     </script>
